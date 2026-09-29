@@ -111,7 +111,7 @@ jobs:
               t=t.replace(".withDepthWrite(true)", ".withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true, 0f, 0f))")
               t=t.replace(".withDepthWrite(false)", ".withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false, 0f, 0f))")
               p.write_text(t)
-                    # JEI integration is optional; exclude it until a 26.1-compatible JEI API is selected.
+          # JEI integration is optional; exclude it until a 26.1-compatible JEI API is selected.
           jei=Path("ccl/src/main/java/codechicken/lib/internal/compat/JEIPlugin.java")
           if jei.exists(): jei.unlink()
       - name: Build CCL
