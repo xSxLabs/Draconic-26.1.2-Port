@@ -40,13 +40,13 @@ jobs:
               t=java.read_text()
               for a,b in replacements.items():
                   t=t.replace(a,b)
-              t=re.sub(r"\\bGuiGraphics\\b", "GuiGraphicsExtractor", t)
-              t=re.sub(r"\\bClickType\\b", "ContainerInput", t)
+              t=re.sub(r"\bGuiGraphics\b", "GuiGraphicsExtractor", t)
+              t=re.sub(r"\bClickType\b", "ContainerInput", t)
               t=t.replace("net.minecraft.client.gui.GuiGraphicsExtractorExtractor", "net.minecraft.client.gui.GuiGraphicsExtractor")
               t=t.replace("net.minecraft.client.renderer.state.BlockOutlineRenderState", "net.minecraft.client.renderer.state.level.BlockOutlineRenderState")
               if "net.minecraft.client.resources.model.Material" in t:
                   t=t.replace("net.minecraft.client.resources.model.Material", "net.minecraft.client.resources.model.sprite.SpriteId")
-                  t=re.sub(r"\\bMaterial\\b", "SpriteId", t)
+                  t=re.sub(r"\bMaterial\b", "SpriteId", t)
               java.write_text(t)
           # JEI integration is optional; exclude it until a 26.1-compatible JEI API is selected.
           jei=Path("ccl/src/main/java/codechicken/lib/internal/compat/JEIPlugin.java")
