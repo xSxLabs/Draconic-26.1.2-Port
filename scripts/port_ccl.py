@@ -97,3 +97,35 @@ if p.exists():
 jei = root / "src/main/java/codechicken/lib/internal/compat/JEIPlugin.java"
 if jei.exists():
     jei.unlink()
+
+
+# Additional 26.1 compiler migrations.
+for java in (root / "src/main/java").rglob("*.java"):
+    t = java.read_text()
+    t = t.replace(".usage()", ".usage")
+    # Vanilla client fluid rendering is now exposed by FluidClientInfo.
+    t = t.replace("IClientFluidTypeExtensions.of(fluidStack.getFluid()).getTintColor()", "net.neoforged.neoforge.fluids.FluidClientInfo.getTintColor(fluidStack)")
+    java.write_text(t)
+
+# CCL GUI extension methods are default interface methods; 26.1 extractor must be viewed as the extension.
+for java in (root / "src/main/java/codechicken/lib/gui").rglob("*.java"):
+    t = java.read_text()
+    t = re.sub(r"\b(graphics|render)\.cc\$", r"((codechicken.lib.gui.render.GuiGraphicsExtension) \1).cc$", t)
+    java.write_text(t)
+
+# AbstractContainerScreen switched from render hooks to extraction hooks.
+p = root / "src/main/java/codechicken/lib/gui/modular/ModularGuiContainer.java"
+if p.exists():
+    t = p.read_text()
+    t = t.replace("public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)", "public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)")
+    t = t.replace("super.render(graphics, mouseX, mouseY, partialTicks)", "super.extractRenderState(graphics, mouseX, mouseY, partialTicks)")
+    t = t.replace("renderBg(GuiGraphicsExtractor", "extractBackground(GuiGraphicsExtractor")
+    t = t.replace("renderLabels(GuiGraphicsExtractor", "extractLabels(GuiGraphicsExtractor")
+    p.write_text(t)
+
+# Block loot provider no longer accepts an externally supplied loot map.
+p = root / "src/main/java/codechicken/lib/datagen/NoValidationBLockLootSubProvider.java"
+if p.exists():
+    t = p.read_text()
+    t = t.replace("super(explosionResistant, flags, map, registries);", "super(explosionResistant, flags, registries);")
+    p.write_text(t)
