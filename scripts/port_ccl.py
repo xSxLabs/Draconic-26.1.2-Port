@@ -129,3 +129,36 @@ if p.exists():
     t = p.read_text()
     t = t.replace("super(explosionResistant, flags, map, registries);", "super(explosionResistant, flags, registries);")
     p.write_text(t)
+
+
+# Exact fixes confirmed from Minecraft 26.1.2 bytecode.
+p = root / "src/main/java/codechicken/lib/render/CCRenderState.java"
+if p.exists():
+    t = p.read_text()
+    # VertexFormatElement no longer exposes Usage; match the canonical element constants.
+    t = t.replace("switch (fmte.usage) {", "switch (fmte) {")
+    t = t.replace("case POSITION ->", "case VertexFormatElement.POSITION ->")
+    t = t.replace("case NORMAL ->", "case VertexFormatElement.NORMAL ->")
+    t = t.replace("case COLOR ->", "case VertexFormatElement.COLOR ->")
+    t = t.replace("case UV ->", "case VertexFormatElement.UV0 ->")
+    # Fluid visual metadata moved out of IClientFluidTypeExtensions in 26.1; use white fallback until renderer-specific metadata is wired.
+    t = re.sub(r"net\.neoforged\.neoforge\.fluids\.FluidClientInfo\.getTintColor\(fluidStack\)", "0xFFFFFF", t)
+    p.write_text(t)
+
+# 26.1 container constructor accepts explicit image dimensions; fields are final.
+p = root / "src/main/java/codechicken/lib/gui/modular/ModularGuiContainer.java"
+if p.exists():
+    t = p.read_text()
+    t = t.replace("super(menu, playerInventory, title);", "super(menu, playerInventory, title, root.getXSize(), root.getYSize());")
+    t = re.sub(r"\s*this\.imageWidth\s*=\s*root\.getXSize\(\);", "", t)
+    t = re.sub(r"\s*this\.imageHeight\s*=\s*root\.getYSize\(\);", "", t)
+    t = t.replace("renderSlot(graphics,", "extractSlot(graphics,")
+    t = t.replace("renderFloatingItem(graphics,", "extractCarriedItem(graphics,")
+    t = t.replace("renderSnapbackItem(graphics)", "extractSnapbackItem(graphics)")
+    p.write_text(t)
+
+# ItemStack codec was consolidated in 26.1.
+p = root / "src/main/java/codechicken/lib/inventory/InventoryUtils.java"
+if p.exists():
+    t = p.read_text().replace("ItemStack.SINGLE_ITEM_CODEC", "ItemStack.CODEC")
+    p.write_text(t)
