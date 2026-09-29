@@ -28,6 +28,7 @@ jobs:
         working-directory: bc
         run: |
           chmod +x gradlew
+          ./gradlew wrapper --gradle-version 9.1.0 || true
           ./gradlew compileJava --stacktrace
       - name: Upload CCL
         if: success()
