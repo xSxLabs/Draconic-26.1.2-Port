@@ -15,6 +15,12 @@ jobs:
         run: git clone --depth 1 https://github.com/TheCBProject/CodeChickenLib.git ccl
       - name: Patch CCL to 26.1.2
         run: python scripts/port_ccl.py
+      - name: Inspect 26.1 APIs
+        working-directory: ccl
+        run: |
+          ./gradlew dependencies --configuration compileClasspath > /tmp/deps.txt || true
+          find ~/.gradle/caches -type f \( -name '*.jar' -o -name '*.java' \) | grep -E 'neo|minecraft|joined|client' | head -300
+          grep -R --include='*.java' -nE 'interface IClientFluidTypeExtensions|class VertexFormatElement|record VertexFormatElement|class AbstractContainerScreen|record CommonInfo|class SmeltingRecipe' ~/.gradle/caches 2>/dev/null | head -120 || true
       - name: Build CCL
         working-directory: ccl
         run: |
