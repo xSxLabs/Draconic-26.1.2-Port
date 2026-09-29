@@ -68,3 +68,11 @@ t=p.read_text()
 t=t.replace('$"BrandonsCore"', 'BrandonsCore')
 t=t.replace('"libs/BrandonsCore-$version-publishing.json"', '"libs/BrandonsCore-$version-publishing.json"')
 p.write_text(t)
+
+# Replace all bare BrandonsCore identifiers introduced by the legacy archive-name rewrite.
+p=root/"build.gradle"
+t=p.read_text()
+t=re.sub(r'(?<!["\'])\bBrandonsCore\b(?!["\'])', '"BrandonsCore"', t)
+# Restore publication declaration syntax, where BrandonsCore is a publication name.
+t=t.replace('"BrandonsCore"(MavenPublication)', 'BrandonsCore(MavenPublication)')
+p.write_text(t)
