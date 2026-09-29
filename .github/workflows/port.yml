@@ -33,15 +33,17 @@ jobs:
               "net.minecraft.world.level.BlockAndTintGetter": "net.minecraft.world.level.BlockAndLightGetter",
               "BlockAndTintGetter": "BlockAndLightGetter",
               "net.minecraft.client.gui.GuiGraphics": "net.minecraft.client.gui.GuiGraphicsExtractor",
-              "GuiGraphics": "GuiGraphicsExtractor",
               "net.minecraft.client.gui.render.state.": "net.minecraft.client.renderer.state.gui.",
               "net.minecraft.world.inventory.ClickType": "net.minecraft.world.inventory.ContainerInput",
-              "ClickType": "ContainerInput",
           }
           for java in Path("ccl/src/main/java").rglob("*.java"):
               t=java.read_text()
               for a,b in replacements.items():
                   t=t.replace(a,b)
+              t=re.sub(r"\\bGuiGraphics\\b", "GuiGraphicsExtractor", t)
+              t=re.sub(r"\\bClickType\\b", "ContainerInput", t)
+              t=t.replace("net.minecraft.client.gui.GuiGraphicsExtractorExtractor", "net.minecraft.client.gui.GuiGraphicsExtractor")
+              t=t.replace("net.minecraft.client.renderer.state.BlockOutlineRenderState", "net.minecraft.client.renderer.BlockOutlineRenderState")
               java.write_text(t)
       - name: Build CCL
         working-directory: ccl
