@@ -202,3 +202,37 @@ if p.exists():
     t = t.replace("protected void extractSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int mouseX, int mouseY)", "protected void extractSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int mouseX, int mouseY)")
     t = t.replace("protected void extractLabels(GuiGraphicsExtractor guiGraphics, int i, int j)", "protected void extractLabels(GuiGraphicsExtractor guiGraphics, int i, int j)")
     p.write_text(t)
+
+
+# Remaining 26.1 GUI hook renames.
+p = root / "src/main/java/codechicken/lib/gui/modular/ModularGuiContainer.java"
+if p.exists():
+    t = p.read_text()
+    t = t.replace("public void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)", "public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)")
+    t = t.replace("super.renderBackground(graphics, mouseX, mouseY, partialTick)", "super.extractBackground(graphics, mouseX, mouseY, partialTick)")
+    t = t.replace("public void renderCarriedItem(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY)", "public void extractCarriedItem(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY)")
+    t = t.replace("super.renderCarriedItem(guiGraphics, mouseX, mouseY)", "super.extractCarriedItem(guiGraphics, mouseX, mouseY)")
+    t = t.replace("public void renderSnapbackItem(GuiGraphicsExtractor guiGraphics)", "public void extractSnapbackItem(GuiGraphicsExtractor guiGraphics)")
+    t = t.replace("super.renderSnapbackItem(guiGraphics)", "super.extractSnapbackItem(guiGraphics)")
+    t = t.replace("protected void renderSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int mouseX, int mouseY)", "protected void extractSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int mouseX, int mouseY)")
+    t = t.replace("super.renderSlot(guiGraphics, slot, mouseX, mouseY)", "super.extractSlot(guiGraphics, slot, mouseX, mouseY)")
+    t = t.replace("protected void renderLabels(GuiGraphicsExtractor guiGraphics, int i, int j)", "protected void extractLabels(GuiGraphicsExtractor guiGraphics, int i, int j)")
+    # Obsolete abstract renderBg hook disappeared in 26.1.
+    t = re.sub(r"\n\s*@Override\n\s*protected void extractBackground\(GuiGraphicsExtractor guiGraphics, float f, int i, int j\) \{\n\s*\}\n", "\n", t)
+    # Old helper for arbitrary floating stacks is gone; extractor can render item directly.
+    t = re.sub(r"extractCarriedItem\(graphics, stack, mouseX - 8, mouseY - yOffset, countOverride\);", "graphics.item(stack, mouseX - 8, mouseY - yOffset);", t)
+    t = re.sub(r"extractCarriedItem\(graphics, snapbackData\.item\(\), xPos \+ leftPos, yPos \+ topPos, null\);", "graphics.item(snapbackData.item(), xPos + leftPos, yPos + topPos);", t)
+    # New helper takes count/type/stack, not the slot set.
+    t = t.replace("AbstractContainerMenu.getQuickCraftPlaceCount(this.quickCraftSlots, this.quickCraftingType, carriedStack)", "AbstractContainerMenu.getQuickCraftPlaceCount(this.quickCraftSlots.size(), this.quickCraftingType, carriedStack)")
+    p.write_text(t)
+
+p = root / "src/main/java/codechicken/lib/gui/render/GuiGraphicsExtension.java"
+if p.exists():
+    t = p.read_text().replace("self().minecraft.getTextureManager()", "Minecraft.getInstance().getTextureManager()")
+    p.write_text(t)
+
+# Ambient occlusion option is now an instance option.
+p = root / "src/main/java/codechicken/lib/render/lighting/LightMatrix.java"
+if p.exists():
+    t = p.read_text().replace("Minecraft.useAmbientOcclusion()", "Minecraft.getInstance().options.ambientOcclusion().get()")
+    p.write_text(t)
