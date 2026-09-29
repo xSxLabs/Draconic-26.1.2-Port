@@ -334,3 +334,20 @@ if p.exists():
     t = p.read_text()
     t = re.sub(r"InventoryScreen\.renderEntityInInventoryFollowsMouse\([\s\S]*?\);", "/* 26.1 entity preview render-state migration pending */", t)
     p.write_text(t)
+
+
+# Final compile bridges.
+p = root / "src/main/java/codechicken/lib/gui/render/GuiGraphicsExtension.java"
+if p.exists():
+    t = p.read_text()
+    if "import net.minecraft.client.gui.navigation.ScreenRectangle;" not in t:
+        t = t.replace("import net.minecraft.client.", "import net.minecraft.client.gui.navigation.ScreenRectangle;\nimport net.minecraft.client.", 1)
+    p.write_text(t)
+
+# Fluid sprite lookup changed radically in 26.1. Use the missing-texture sprite only as a temporary visual fallback;
+# this keeps the fluid cuboid renderer callable while preserving all geometry.
+p = root / "src/main/java/codechicken/lib/render/RenderUtils.java"
+if p.exists():
+    t = p.read_text()
+    t = re.sub(r"TextureAtlasSprite sprite = .*?;", "TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().get(net.minecraft.client.resources.model.sprite.SpriteId.MISSING);", t, count=1)
+    p.write_text(t)
