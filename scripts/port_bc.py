@@ -47,3 +47,9 @@ if w.exists():
 w=root/"gradle/wrapper/gradle-wrapper.properties"
 if w.exists():
     w.write_text(w.read_text().replace("gradle-8.1-bin.zip", "gradle-9.1.0-bin.zip"))
+
+# Gradle 9 removed archivesBaseName project property.
+p=root/"build.gradle"
+t=p.read_text()
+t=t.replace('archivesBaseName = "BrandonsCore"', 'base { archivesName = "BrandonsCore" }\ndef archivesBaseName = "BrandonsCore"')
+p.write_text(t)
