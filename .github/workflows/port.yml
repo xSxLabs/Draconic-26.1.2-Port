@@ -15,12 +15,29 @@ jobs:
         run: git clone --depth 1 https://github.com/TheCBProject/CodeChickenLib.git ccl
       - name: Patch CCL to 26.1.2
         run: python scripts/port_ccl.py
-      - name: Inspect 26.1 APIs
+      - name: Inspect transformed 26.1 bytecode
         working-directory: ccl
         run: |
-          ./gradlew dependencies --configuration compileClasspath > /tmp/deps.txt || true
-          find ~/.gradle/caches -type f \( -name '*.jar' -o -name '*.java' \) | grep -E 'neo|minecraft|joined|client' | head -300
-          grep -R --include='*.java' -nE 'interface IClientFluidTypeExtensions|class VertexFormatElement|record VertexFormatElement|class AbstractContainerScreen|record CommonInfo|class SmeltingRecipe' ~/.gradle/caches 2>/dev/null | head -120 || true
+          ./gradlew compileJava --info >/tmp/compile.log 2>&1 || true
+          echo "=== likely Minecraft/NeoForge jars ==="
+          find ~/.gradle/caches .gradle -type f -name '*.jar' 2>/dev/null | while read j; do
+            if jar tf "$j" 2>/dev/null | grep -q 'com/mojang/blaze3d/vertex/VertexFormatElement.class'; then
+              echo "MCJAR=$j"
+              javap -classpath "$j" com.mojang.blaze3d.vertex.VertexFormatElement || true
+              javap -classpath "$j" net.minecraft.client.gui.screens.inventory.AbstractContainerScreen || true
+              javap -classpath "$j" net.minecraft.world.item.crafting.Recipe || true
+              javap -classpath "$j" net.minecraft.world.item.crafting.SmeltingRecipe || true
+              javap -classpath "$j" net.minecraft.world.item.ItemStack || true
+              break
+            fi
+          done
+          find ~/.gradle/caches .gradle -type f -name '*.jar' 2>/dev/null | while read j; do
+            if jar tf "$j" 2>/dev/null | grep -q 'net/neoforged/neoforge/client/extensions/common/IClientFluidTypeExtensions.class'; then
+              echo "NEOJAR=$j"
+              javap -classpath "$j" net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions || true
+              break
+            fi
+          done
       - name: Build CCL
         working-directory: ccl
         run: |
