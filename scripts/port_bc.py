@@ -42,3 +42,8 @@ if w.exists():
     t=w.read_text()
     t=re.sub(r"gradle-[0-9.]+-(bin|all)\\.zip", "gradle-9.1.0-bin.zip", t)
     w.write_text(t)
+
+# Force legacy wrapper URL forward for Java 25.
+w=root/"gradle/wrapper/gradle-wrapper.properties"
+if w.exists():
+    w.write_text(w.read_text().replace("gradle-8.1-bin.zip", "gradle-9.1.0-bin.zip"))
