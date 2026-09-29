@@ -76,3 +76,11 @@ t=re.sub(r'(?<!["\'])\bBrandonsCore\b(?!["\'])', '"BrandonsCore"', t)
 # Restore publication declaration syntax, where BrandonsCore is a publication name.
 t=t.replace('"BrandonsCore"(MavenPublication)', 'BrandonsCore(MavenPublication)')
 p.write_text(t)
+
+# Publishing is irrelevant to local port builds and still references removed legacy Gradle properties.
+p=root/"build.gradle"
+t=p.read_text()
+idx=t.find("\npublishing {")
+if idx != -1:
+    t=t[:idx]+"\n"
+p.write_text(t)
