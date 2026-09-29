@@ -287,3 +287,28 @@ if p.exists():
     t = t.replace("Recipe<?> build(String group, CraftingBookCategory category, ItemStack result, NonNullList<Ingredient> ingredients);",
                   "Recipe<?> build(Recipe.CommonInfo commonInfo, net.minecraft.world.item.crafting.CraftingRecipe.CraftingBookInfo bookInfo, net.minecraft.world.item.ItemStackTemplate result, NonNullList<Ingredient> ingredients);")
     p.write_text(t)
+
+
+# 26.1 screen background extraction rename.
+p = root / "src/main/java/codechicken/lib/gui/modular/ModularGuiScreen.java"
+if p.exists():
+    t = p.read_text()
+    t = t.replace("public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)", "public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)")
+    t = t.replace("renderBackground(graphics, mouseX, mouseY, partialTicks)", "extractBackground(graphics, mouseX, mouseY, partialTicks)")
+    p.write_text(t)
+
+# Fluid client extension texture/tint API was removed. Resolve the sprite from the fluid model data later;
+# preserve geometry and use a neutral tint as a compile-safe bridge.
+p = root / "src/main/java/codechicken/lib/render/RenderUtils.java"
+if p.exists():
+    t = p.read_text()
+    t = re.sub(r"TextureAtlasSprite sprite = Minecraft\.getInstance\(\)\.getAtlasManager\(\)\.get\(ClientHooks\.getBlockMaterial\(props\.getStillTexture\(\)\)\);", "TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().get(net.minecraft.client.renderer.block.model.BlockModelShaper.getParticleIcon(fluidStack.getFluid().defaultFluidState()));", t)
+    t = t.replace("ccrs.baseColour = props.getTintColor() << 8 | alpha;", "ccrs.baseColour = 0xFFFFFF00 | alpha;")
+    p.write_text(t)
+
+# Dev-only weather reset API changed; keep the command useful with current gamerules and clear weather command path.
+p = root / "src/main/java/codechicken/lib/internal/command/dev/DevCommands.java"
+if p.exists():
+    t = p.read_text().replace("server.getWorldData().getGameRules()", "server.getGameRules()")
+    t = re.sub(r"\s*level\.setWeatherParameters\(6000, 0, false, false\);", "", t)
+    p.write_text(t)
