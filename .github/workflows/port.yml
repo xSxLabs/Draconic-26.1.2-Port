@@ -20,6 +20,15 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test -x javadoc --stacktrace
+      - name: Clone BrandonsCore
+        run: git clone --depth 1 https://github.com/Draconic-Inc/BrandonsCore.git bc
+      - name: Patch BrandonsCore to 26.1.2
+        run: python scripts/port_bc.py
+      - name: Compile BrandonsCore
+        working-directory: bc
+        run: |
+          chmod +x gradlew
+          ./gradlew compileJava --stacktrace
       - name: Upload CCL
         if: success()
         uses: actions/upload-artifact@v4
