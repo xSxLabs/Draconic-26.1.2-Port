@@ -53,3 +53,11 @@ p=root/"build.gradle"
 t=p.read_text()
 t=t.replace('archivesBaseName = "BrandonsCore"', 'base { archivesName = "BrandonsCore" }\ndef archivesBaseName = "BrandonsCore"')
 p.write_text(t)
+
+p=root/"build.gradle"
+t=p.read_text()
+t=t.replace('def archivesBaseName = "BrandonsCore"', '')
+t=t.replace('archivesBaseName', '"BrandonsCore"')
+# Repair any accidental quoted assignment if encountered.
+t=t.replace('"BrandonsCore" = "BrandonsCore"', 'base { archivesName = "BrandonsCore" }')
+p.write_text(t)
