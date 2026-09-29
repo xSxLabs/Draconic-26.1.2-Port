@@ -25,6 +25,24 @@ jobs:
           s=p.read_text().replace("JavaLanguageVersion.of(21)","JavaLanguageVersion.of(25)")
           s=re.sub(r'\n\s*compileOnly\("mezz\.jei:jei-\$\{mc_version\}-neoforge:\$\{jei_version\}"\) \{\s*transitive false\s*\}\s*', '\n', s)
           p.write_text(s)
+          replacements = {
+              "net.minecraft.client.renderer.block.model.BakedQuad": "net.minecraft.client.resources.model.geometry.BakedQuad",
+              "net.minecraft.client.resources.model.QuadCollection": "net.minecraft.client.resources.model.geometry.QuadCollection",
+              "net.minecraft.client.renderer.block.model.BlockModelPart": "net.minecraft.client.renderer.block.dispatch.BlockStateModelPart",
+              "BlockModelPart": "BlockStateModelPart",
+              "net.minecraft.world.level.BlockAndTintGetter": "net.minecraft.world.level.BlockAndLightGetter",
+              "BlockAndTintGetter": "BlockAndLightGetter",
+              "net.minecraft.client.gui.GuiGraphics": "net.minecraft.client.gui.GuiGraphicsExtractor",
+              "GuiGraphics": "GuiGraphicsExtractor",
+              "net.minecraft.client.gui.render.state.": "net.minecraft.client.renderer.state.gui.",
+              "net.minecraft.world.inventory.ClickType": "net.minecraft.world.inventory.ContainerInput",
+              "ClickType": "ContainerInput",
+          }
+          for java in Path("ccl/src/main/java").rglob("*.java"):
+              t=java.read_text()
+              for a,b in replacements.items():
+                  t=t.replace(a,b)
+              java.write_text(t)
       - name: Build CCL
         working-directory: ccl
         run: |
