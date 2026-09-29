@@ -258,3 +258,32 @@ if p.exists():
     if "import net.minecraft.client.Minecraft;" not in t:
         t = t.replace("import net.minecraft.client.", "import net.minecraft.client.Minecraft;\nimport net.minecraft.client.", 1)
     p.write_text(t)
+
+
+# Recipe constructor migration for 26.1 CommonInfo/BookInfo/ItemStackTemplate.
+p = root / "src/main/java/codechicken/lib/datagen/recipe/FurnaceRecipeBuilder.java"
+if p.exists():
+    t = p.read_text()
+    t = t.replace("return factory.build(group, category, requireNonNull(ingredient), result, experience, cookingTime);",
+                  "return factory.build(new Recipe.CommonInfo(true), new AbstractCookingRecipe.CookingBookInfo(category, group), requireNonNull(ingredient), net.minecraft.world.item.ItemStackTemplate.fromNonEmptyStack(result), experience, cookingTime);")
+    t = t.replace("Recipe<?> build(String group, CookingBookCategory category, Ingredient ingredient, ItemStack result, float experience, int cookingTime);",
+                  "Recipe<?> build(Recipe.CommonInfo commonInfo, AbstractCookingRecipe.CookingBookInfo bookInfo, Ingredient ingredient, net.minecraft.world.item.ItemStackTemplate result, float experience, int cookingTime);")
+    p.write_text(t)
+
+p = root / "src/main/java/codechicken/lib/datagen/recipe/ShapedRecipeBuilder.java"
+if p.exists():
+    t = p.read_text()
+    t = t.replace("group,\n                category,\n                ShapedRecipePattern.of(keys, patternLines),\n                result,\n                showNotification",
+                  "new Recipe.CommonInfo(showNotification),\n                new CraftingRecipe.CraftingBookInfo(category, group),\n                ShapedRecipePattern.of(keys, patternLines),\n                net.minecraft.world.item.ItemStackTemplate.fromNonEmptyStack(result)")
+    t = t.replace("Recipe<?> build(String group, CraftingBookCategory category, ShapedRecipePattern pattern, ItemStack result, boolean showNotification);",
+                  "Recipe<?> build(Recipe.CommonInfo commonInfo, CraftingRecipe.CraftingBookInfo bookInfo, ShapedRecipePattern pattern, net.minecraft.world.item.ItemStackTemplate result);")
+    p.write_text(t)
+
+p = root / "src/main/java/codechicken/lib/datagen/recipe/ShapelessRecipeBuilder.java"
+if p.exists():
+    t = p.read_text()
+    t = t.replace("group,\n                category,\n                result,\n                ingredients",
+                  "new Recipe.CommonInfo(true),\n                new net.minecraft.world.item.crafting.CraftingRecipe.CraftingBookInfo(category, group),\n                net.minecraft.world.item.ItemStackTemplate.fromNonEmptyStack(result),\n                ingredients")
+    t = t.replace("Recipe<?> build(String group, CraftingBookCategory category, ItemStack result, NonNullList<Ingredient> ingredients);",
+                  "Recipe<?> build(Recipe.CommonInfo commonInfo, net.minecraft.world.item.crafting.CraftingRecipe.CraftingBookInfo bookInfo, net.minecraft.world.item.ItemStackTemplate result, NonNullList<Ingredient> ingredients);")
+    p.write_text(t)
