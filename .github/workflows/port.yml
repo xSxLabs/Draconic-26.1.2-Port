@@ -47,6 +47,22 @@ jobs:
               if "net.minecraft.client.resources.model.Material" in t:
                   t=t.replace("net.minecraft.client.resources.model.Material", "net.minecraft.client.resources.model.sprite.SpriteId")
                   t=re.sub(r"\bMaterial\b", "SpriteId", t)
+              t=t.replace("RenderLevelStageEvent.AfterParticles", "RenderLevelStageEvent.AfterTranslucentParticles")
+              t=t.replace("LevelRenderer.getLightColor(", "LevelRenderer.getLightCoords(")
+              t=re.sub(r"\\.random\\.", ".getRandom().", t)
+              # GuiGraphicsExtractor method renames in 26.1.
+              for a,b in {
+                  ".drawString(": ".text(",
+                  ".drawCenteredString(": ".centeredText(",
+                  ".renderItemDecorations(": ".itemDecorations(",
+                  ".renderTooltip(": ".tooltip(",
+                  ".renderFakeItem(": ".fakeItem(",
+                  ".renderItem(": ".item(",
+                  ".renderOutline(": ".outline(",
+                  ".hLine(": ".horizontalLine(",
+                  ".vLine(": ".verticalLine(",
+              }.items():
+                  t=t.replace(a,b)
               java.write_text(t)
           # JEI integration is optional; exclude it until a 26.1-compatible JEI API is selected.
           jei=Path("ccl/src/main/java/codechicken/lib/internal/compat/JEIPlugin.java")
