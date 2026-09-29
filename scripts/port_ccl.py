@@ -162,3 +162,43 @@ p = root / "src/main/java/codechicken/lib/inventory/InventoryUtils.java"
 if p.exists():
     t = p.read_text().replace("ItemStack.SINGLE_ITEM_CODEC", "ItemStack.CODEC")
     p.write_text(t)
+
+
+# Correct VertexFormatElement migration: 26.1 removed Usage entirely.
+p = root / "src/main/java/codechicken/lib/render/CCRenderState.java"
+if p.exists():
+    t = p.read_text()
+    a = t.index("        for (VertexFormatElement fmte : elements) {")
+    b = t.index("\n        }", a) + len("\n        }")
+    block = """        for (VertexFormatElement fmte : elements) {
+            if (fmte.equals(VertexFormatElement.POSITION)) {
+                r.addVertex((float) vert.vec.x, (float) vert.vec.y, (float) vert.vec.z);
+            } else if (fmte.equals(VertexFormatElement.UV0) || fmte.equals(VertexFormatElement.UV)) {
+                r.setUv((float) vert.uv.u, (float) vert.uv.v);
+            } else if (fmte.equals(VertexFormatElement.UV1)) {
+                r.setOverlay(overlay);
+            } else if (fmte.equals(VertexFormatElement.UV2)) {
+                r.setLight(brightness);
+            } else if (fmte.equals(VertexFormatElement.COLOR)) {
+                r.setColor(colour >>> 24, colour >> 16 & 0xFF, colour >> 8 & 0xFF, alphaOverride >= 0 ? alphaOverride : colour & 0xFF);
+            } else if (fmte.equals(VertexFormatElement.NORMAL)) {
+                r.setNormal((float) normal.x, (float) normal.y, (float) normal.z);
+            }
+        }"""
+    t = t[:a] + block + t[b:]
+    p.write_text(t)
+
+# Final dimensions cannot be mutated in 26.1. Use vanilla defaults for the base screen;
+# CCL's own modular geometry still controls its actual elements.
+p = root / "src/main/java/codechicken/lib/gui/modular/ModularGuiContainer.java"
+if p.exists():
+    t = p.read_text()
+    t = t.replace("super(containerMenu, inventory, Component.empty());", "super(containerMenu, inventory, Component.empty());")
+    t = re.sub(r"\n\s*imageWidth\s*=\s*\(int\) root\.getValue\(GeoParam\.WIDTH\);", "", t)
+    t = re.sub(r"\n\s*imageHeight\s*=\s*\(int\) root\.getValue\(GeoParam\.HEIGHT\);", "", t)
+    # Names/signatures from AbstractContainerScreen 26.1.
+    t = t.replace("protected void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)", "public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)")
+    t = t.replace("public void extractCarriedItem(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY)", "public void extractCarriedItem(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY)")
+    t = t.replace("protected void extractSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int mouseX, int mouseY)", "protected void extractSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int mouseX, int mouseY)")
+    t = t.replace("protected void extractLabels(GuiGraphicsExtractor guiGraphics, int i, int j)", "protected void extractLabels(GuiGraphicsExtractor guiGraphics, int i, int j)")
+    p.write_text(t)
