@@ -91,3 +91,9 @@ t=p.read_text()
 t=re.sub(r'\ndef publishingMetadata = .*?\n', '\n', t)
 t=re.sub(r'\ndef publishingMetadataTask = tasks\.register\("publishingMetadata"\) \{[\s\S]*?\n\}\n\n', '\n', t, count=1)
 p.write_text(t)
+
+# BrandonsCore master is still Forge-namespaced. NeoForge kept most APIs under equivalent net.neoforged paths.
+for java in (root/"src/main/java").rglob("*.java"):
+    t=java.read_text()
+    t=t.replace("net.minecraftforge.", "net.neoforged.neoforge.")
+    java.write_text(t)
