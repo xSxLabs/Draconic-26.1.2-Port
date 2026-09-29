@@ -61,3 +61,10 @@ t=t.replace('archivesBaseName', '"BrandonsCore"')
 # Repair any accidental quoted assignment if encountered.
 t=t.replace('"BrandonsCore" = "BrandonsCore"', 'base { archivesName = "BrandonsCore" }')
 p.write_text(t)
+
+# Repair interpolation damaged by legacy archivesBaseName replacement.
+p=root/"build.gradle"
+t=p.read_text()
+t=t.replace('$"BrandonsCore"', 'BrandonsCore')
+t=t.replace('"libs/BrandonsCore-$version-publishing.json"', '"libs/BrandonsCore-$version-publishing.json"')
+p.write_text(t)
