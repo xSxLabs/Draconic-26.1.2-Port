@@ -64,7 +64,54 @@ jobs:
               }.items():
                   t=t.replace(a,b)
               java.write_text(t)
-          # JEI integration is optional; exclude it until a 26.1-compatible JEI API is selected.
+          # Port CCL's mutable Quad wrapper through NeoForge's 26.1 MutableQuad.
+          q=Path("ccl/src/main/java/codechicken/lib/model/Quad.java")
+          t=q.read_text()
+          t=t.replace("import net.neoforged.neoforge.client.model.quad.BakedColors;", "import net.neoforged.neoforge.client.model.quad.BakedColors;\nimport net.neoforged.neoforge.client.model.quad.MutableQuad;")
+          t=t.replace("        var normals = quad.bakedNormals();\n        var colors = quad.bakedColors();", "        var mq = new MutableQuad().setFrom(quad);\n        var normals = quad.bakedNormals();\n        var colors = quad.bakedColors();")
+          t=t.replace("        tintIndex = quad.tintIndex();\n        direction = quad.direction();\n        sprite = quad.sprite();\n        shade = quad.shade();\n        lightEmission = quad.lightEmission();\n        ambientOcclusion = quad.hasAmbientOcclusion();", "        tintIndex = mq.tintIndex();\n        direction = mq.direction();\n        sprite = mq.sprite();\n        shade = mq.shade();\n        lightEmission = mq.lightEmission();\n        ambientOcclusion = mq.hasAmbientOcclusion();")
+          start=t.index("    public BakedQuad bake() {")
+          end=t.index("\n    private static float interpColor", start)
+          new_bake='''    public BakedQuad bake() {
+        var mq = new MutableQuad();
+        mq.setDirection(requireNonNull(direction, "Direction not computed."));
+        // CCL historically emitted general block quads; use solid/cutout defaults matching vanilla block items.
+        mq.setSprite(requireNonNull(sprite, "Quad requires a sprite."), net.minecraft.client.renderer.chunk.ChunkSectionLayer.SOLID, net.minecraft.client.renderer.Sheets.cutoutBlockItemSheet());
+        mq.setTintIndex(tintIndex).setShade(shade).setLightEmission(lightEmission).setAmbientOcclusion(ambientOcclusion);
+        for (int i = 0; i < 4; i++) {
+            mq.setPosition(i, vertices[i].vec.vector3f());
+            mq.setPackedUv(i, vertices[i].packUV());
+            mq.setNormal(i, (float) vertices[i].normal.x, (float) vertices[i].normal.y, (float) vertices[i].normal.z);
+            mq.setColor(i, vertices[i].color);
+        }
+        return mq.toBakedQuad();
+    }
+'''
+          t=t[:start]+new_bake+t[end:]
+          q.write_text(t)
+          # Protected Level.random -> accessor.
+          for java in Path("ccl/src/main/java").rglob("*.java"):
+              t=java.read_text()
+              t=re.sub(r"\\b(world|level)\\.random\\.", r"\\1.getRandom().", t)
+              java.write_text(t)
+          # 26.1 fluid extension stack overloads were removed; fall back to base material properties.
+          for pth in ["ccl/src/main/java/codechicken/lib/render/CCRenderState.java","ccl/src/main/java/codechicken/lib/render/RenderUtils.java"]:
+              p=Path(pth)
+              if p.exists():
+                  t=p.read_text().replace("getTintColor(fluidStack)", "getTintColor()").replace("getTintColor(stack)", "getTintColor()").replace("getStillTexture(stack)", "getStillTexture()")
+                  p.write_text(t)
+          # Particle terrain layer split by transparency in 26.1.
+          p=Path("ccl/src/main/java/codechicken/lib/render/particle/CustomBreakingParticle.java")
+          if p.exists(): p.write_text(p.read_text().replace("Layer.TERRAIN", "Layer.OPAQUE_TERRAIN"))
+          # Depth write is now part of DepthStencilState. Preserve inherited test/bias and toggle write.
+          p=Path("ccl/src/main/java/codechicken/lib/render/CCRenderPipelines.java")
+          if p.exists():
+              t=p.read_text()
+              t=t.replace("import com.mojang.blaze3d.pipeline.RenderPipeline;", "import com.mojang.blaze3d.pipeline.RenderPipeline;\nimport com.mojang.blaze3d.pipeline.DepthStencilState;\nimport com.mojang.blaze3d.platform.CompareOp;")
+              t=t.replace(".withDepthWrite(true)", ".withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true, 0f, 0f))")
+              t=t.replace(".withDepthWrite(false)", ".withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false, 0f, 0f))")
+              p.write_text(t)
+                    # JEI integration is optional; exclude it until a 26.1-compatible JEI API is selected.
           jei=Path("ccl/src/main/java/codechicken/lib/internal/compat/JEIPlugin.java")
           if jei.exists(): jei.unlink()
       - name: Build CCL
