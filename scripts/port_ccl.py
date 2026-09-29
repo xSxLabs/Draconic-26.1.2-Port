@@ -312,3 +312,25 @@ if p.exists():
     t = p.read_text().replace("server.getWorldData().getGameRules()", "server.getGameRules()")
     t = re.sub(r"\s*level\.setWeatherParameters\(6000, 0, false, false\);", "", t)
     p.write_text(t)
+
+
+# Correct the fluid bridge against the actual RenderUtils local variable ('stack').
+p = root / "src/main/java/codechicken/lib/render/RenderUtils.java"
+if p.exists():
+    t = p.read_text()
+    t = re.sub(r"TextureAtlasSprite sprite = .*?;", "TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().get(ClientHooks.getBlockMaterial(stack.getFluid().defaultFluidState().getType().builtInRegistryHolder().key().identifier()));", t, count=1)
+    p.write_text(t)
+
+# BlitRenderState#getBounds became private; calculate the untransformed rectangle directly.
+p = root / "src/main/java/codechicken/lib/gui/render/GuiGraphicsExtension.java"
+if p.exists():
+    t = p.read_text()
+    t = t.replace("var bounds = BlitRenderState.getBounds((int) x0, (int) y0, (int) x1, (int) y1, pose, scissor);", "var bounds = new ScreenRectangle((int) x0, (int) y0, Math.max(0, (int) (x1 - x0)), Math.max(0, (int) (y1 - y0)));")
+    p.write_text(t)
+
+# Entity preview helper was removed in 26.1. Disable only this optional preview path until the new entity render-state API is wired.
+p = root / "src/main/java/codechicken/lib/gui/modular/elements/GuiEntityRenderer.java"
+if p.exists():
+    t = p.read_text()
+    t = re.sub(r"InventoryScreen\.renderEntityInInventoryFollowsMouse\([\s\S]*?\);", "/* 26.1 entity preview render-state migration pending */", t)
+    p.write_text(t)
