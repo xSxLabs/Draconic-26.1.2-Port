@@ -1,0 +1,37 @@
+name: Port probe 26.1.2
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Clone upstream sources
+        run: |
+          git clone --depth 1 https://github.com/TheCBProject/CodeChickenLib.git ccl
+          git clone --depth 1 https://github.com/Draconic-Inc/BrandonsCore.git bcore
+          git clone --depth 1 --branch 1.21 https://github.com/Draconic-Inc/Draconic-Evolution.git de
+          echo "=== branches ==="
+          (cd ccl && git branch --show-current && git log -1 --oneline)
+          (cd bcore && git branch --show-current && git log -1 --oneline)
+          (cd de && git branch --show-current && git log -1 --oneline)
+      - name: Inventory build configs
+        run: |
+          for d in ccl bcore de; do
+            echo "===== $d ====="
+            grep -R -nE "mc_version|minecraft_version|neo_version|neoforge|JavaLanguageVersion" "$d"/gradle.properties "$d"/build.gradle 2>/dev/null | head -80 || true
+          done
+      - name: Upload source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: upstream-source-snapshot
+          path: |
+            ccl
+            bcore
+            de
+          include-hidden-files: true
