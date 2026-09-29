@@ -1,9 +1,9 @@
-name: Port probe 26.1.2
+name: Port build 26.1.2
 on:
   push:
   workflow_dispatch:
 jobs:
-  probe:
+  ccl:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -11,27 +11,28 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
-      - name: Clone upstream sources
+      - name: Clone CodeChickenLib
+        run: git clone --depth 1 https://github.com/TheCBProject/CodeChickenLib.git ccl
+      - name: Patch CCL to 26.1.2
+        shell: python
         run: |
-          git clone --depth 1 https://github.com/TheCBProject/CodeChickenLib.git ccl
-          git clone --depth 1 https://github.com/Draconic-Inc/BrandonsCore.git bcore
-          git clone --depth 1 --branch 1.21 https://github.com/Draconic-Inc/Draconic-Evolution.git de
-          echo "=== branches ==="
-          (cd ccl && git branch --show-current && git log -1 --oneline)
-          (cd bcore && git branch --show-current && git log -1 --oneline)
-          (cd de && git branch --show-current && git log -1 --oneline)
-      - name: Inventory build configs
+          from pathlib import Path
+          import re
+          p=Path("ccl/gradle.properties")
+          s=p.read_text().replace("mc_version=1.21.11","mc_version=26.1.2").replace("forge_version=21.11.42","forge_version=26.1.2.106")
+          p.write_text(s)
+          p=Path("ccl/build.gradle")
+          s=p.read_text().replace("JavaLanguageVersion.of(21)","JavaLanguageVersion.of(25)")
+          s=re.sub(r'\n\s*compileOnly\("mezz\.jei:jei-\$\{mc_version\}-neoforge:\$\{jei_version\}"\) \{\s*transitive false\s*\}\s*', '\n', s)
+          p.write_text(s)
+      - name: Build CCL
+        working-directory: ccl
         run: |
-          for d in ccl bcore de; do
-            echo "===== $d ====="
-            grep -R -nE "mc_version|minecraft_version|neo_version|neoforge|JavaLanguageVersion" "$d"/gradle.properties "$d"/build.gradle 2>/dev/null | head -80 || true
-          done
-      - name: Upload source snapshot
+          chmod +x gradlew
+          ./gradlew clean build -x test -x javadoc --stacktrace
+      - name: Upload CCL
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: upstream-source-snapshot
-          path: |
-            ccl
-            bcore
-            de
-          include-hidden-files: true
+          name: CodeChickenLib-26.1.2-port
+          path: ccl/build/libs/*.jar
