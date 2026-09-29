@@ -351,3 +351,9 @@ if p.exists():
     t = p.read_text()
     t = re.sub(r"TextureAtlasSprite sprite = .*?;", "TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().get(net.minecraft.client.resources.model.sprite.SpriteId.MISSING);", t, count=1)
     p.write_text(t)
+
+
+p = root / "src/main/java/codechicken/lib/render/RenderUtils.java"
+if p.exists():
+    t = p.read_text().replace("net.minecraft.client.resources.model.sprite.SpriteId.MISSING", "new net.minecraft.client.resources.model.sprite.SpriteId(net.minecraft.resources.Identifier.withDefaultNamespace(\"missingno\"), net.minecraft.resources.Identifier.withDefaultNamespace(\"missingno\"))")
+    p.write_text(t)
