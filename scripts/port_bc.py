@@ -36,3 +36,9 @@ s=s[:a]+deps+s[b:]
 # Remove obsolete reobf finalizer.
 s=s.replace("    finalizedBy 'reobfJar'\n","").replace("    dependsOn(\"reobfJar\")\n","")
 p.write_text(s)
+
+w=root/"gradle/wrapper/gradle-wrapper.properties"
+if w.exists():
+    t=w.read_text()
+    t=re.sub(r"gradle-[0-9.]+-(bin|all)\\.zip", "gradle-9.1.0-bin.zip", t)
+    w.write_text(t)
