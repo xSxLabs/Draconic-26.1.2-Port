@@ -236,3 +236,25 @@ p = root / "src/main/java/codechicken/lib/render/lighting/LightMatrix.java"
 if p.exists():
     t = p.read_text().replace("Minecraft.useAmbientOcclusion()", "Minecraft.getInstance().options.ambientOcclusion().get()")
     p.write_text(t)
+
+
+# ItemStackTemplate is the immutable 26.1 crafting representation.
+p = root / "src/main/java/codechicken/lib/inventory/InventoryUtils.java"
+if p.exists():
+    t = p.read_text()
+    t = t.replace("ItemStack remaining = stack.getCraftingRemainder();", "var remainingTemplate = stack.getCraftingRemainder();\n        ItemStack remaining = remainingTemplate == null ? ItemStack.EMPTY : remainingTemplate.create();")
+    p.write_text(t)
+
+# TypedInstance exposes tags() in 26.1.
+p = root / "src/main/java/codechicken/lib/colour/EnumColour.java"
+if p.exists():
+    t = p.read_text().replace("stack.getTags()", "stack.tags()")
+    p.write_text(t)
+
+# GuiGraphicsExtension needs explicit Minecraft import after replacing the private extractor field.
+p = root / "src/main/java/codechicken/lib/gui/render/GuiGraphicsExtension.java"
+if p.exists():
+    t = p.read_text()
+    if "import net.minecraft.client.Minecraft;" not in t:
+        t = t.replace("import net.minecraft.client.", "import net.minecraft.client.Minecraft;\nimport net.minecraft.client.", 1)
+    p.write_text(t)
