@@ -84,3 +84,10 @@ idx=t.find("\npublishing {")
 if idx != -1:
     t=t[:idx]+"\n"
 p.write_text(t)
+
+# The publishing metadata variable sits before the publishing block; remove it too.
+p=root/"build.gradle"
+t=p.read_text()
+t=re.sub(r'\ndef publishingMetadata = .*?\n', '\n', t)
+t=re.sub(r'\ndef publishingMetadataTask = tasks\.register\("publishingMetadata"\) \{[\s\S]*?\n\}\n\n', '\n', t, count=1)
+p.write_text(t)
