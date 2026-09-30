@@ -357,3 +357,12 @@ p = root / "src/main/java/codechicken/lib/render/RenderUtils.java"
 if p.exists():
     t = p.read_text().replace("net.minecraft.client.resources.model.sprite.SpriteId.MISSING", "new net.minecraft.client.resources.model.sprite.SpriteId(net.minecraft.resources.Identifier.withDefaultNamespace(\"missingno\"), net.minecraft.resources.Identifier.withDefaultNamespace(\"missingno\"))")
     p.write_text(t)
+
+# Restore legacy 1.21.1 CCL API surface used by BrandonsCore/DE, then let targeted 26.1 patches adapt it.
+legacy = Path("ccl-legacy")
+if legacy.exists():
+    for rel in ["src/main/java/codechicken/lib/internal/network/ClientConfigurationPacketHandler.java"]:
+        src=legacy/rel; dst=root/rel
+        if src.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_text(src.read_text().replace("net.minecraft.resources.ResourceLocation","net.minecraft.resources.Identifier").replace("ResourceLocation","Identifier"))
