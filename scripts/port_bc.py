@@ -1,5 +1,6 @@
 from pathlib import Path
 import re
+import shutil
 root=Path("bc")
 
 p=root/"gradle.properties"
