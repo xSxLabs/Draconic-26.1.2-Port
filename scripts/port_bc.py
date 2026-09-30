@@ -179,3 +179,14 @@ s=p.read_text()
 if "Xmaxerrs" not in s:
     s += "\ntasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs', '2000'] }\n"
 p.write_text(s)
+
+# Broad 26.1 NBT Optional migration across BC.
+for java in (root/"src/main/java").rglob("*.java"):
+    t=java.read_text()
+    t=re.sub(r'\.contains\(([^,\n()]+),\s*\d+\)', r'.contains(\1)', t)
+    t=re.sub(r'\.getList\(([^,\n()]+),\s*\d+\)', r'.getList(\1)', t)
+    for meth,default in [("getBoolean","false"),("getByte","(byte) 0"),("getShort","(short) 0"),("getInt","0"),("getLong","0L"),("getFloat","0F"),("getDouble","0D"),("getString",'""')]:
+        pat=r'\.'+meth+r'\(([^\n()]+)\)(?!\.orElse)'
+        t=re.sub(pat, lambda m: "."+meth+"("+m.group(1)+").orElse("+default+")", t)
+    t=re.sub(r'\.getCompound\(([^\n()]+)\)(?!\.orElse)', r'.getCompound(\1).orElseGet(CompoundTag::new)', t)
+    java.write_text(t)
