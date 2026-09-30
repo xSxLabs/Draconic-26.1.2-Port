@@ -287,3 +287,10 @@ if q.exists():
     t=t.replace("((IChangeListener) tile).onNeighborChange(fromPos);", "((IChangeListener) tile).onNeighborChange(pos);")
     t=t.replace("super.neighborChanged(state, world, pos, blockIn, fromPos, isMoving)", "super.neighborChanged(state, world, pos, blockIn, orientation, isMoving)")
     q.write_text(t)
+
+# Block tooltip hook moved away from Block in 26.1; preserve saved-data indication through item-side port later.
+q=root/"src/main/java/com/brandon3055/brandonscore/blocks/BlockBCore.java"
+if q.exists():
+    t=q.read_text()
+    t=re.sub(r'\n    @OnlyIn \(Dist\.CLIENT\)\n    @Override\n    public void appendHoverText\([\s\S]*?\n    \}\n', '\n', t, count=1)
+    q.write_text(t)
