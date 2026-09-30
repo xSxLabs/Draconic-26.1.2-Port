@@ -172,3 +172,10 @@ q=root/"src/main/java/com/brandon3055/brandonscore/api/power/OPStorage.java"
 if q.exists():
     t=q.read_text().replace("((NumericTag) tag).getAsLong()","((NumericTag) tag).longValue()")
     q.write_text(t)
+
+# Raise javac error cap so migration can be grouped accurately.
+p=root/"build.gradle"
+s=p.read_text()
+if "Xmaxerrs" not in s:
+    s += "\ntasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs', '2000'] }\n"
+p.write_text(s)
