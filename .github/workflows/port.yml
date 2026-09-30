@@ -13,6 +13,8 @@ jobs:
           java-version: '25'
       - name: Clone CodeChickenLib
         run: git clone --depth 1 https://github.com/TheCBProject/CodeChickenLib.git ccl
+      - name: Clone CCL legacy API source
+        run: git clone --depth 1 --branch 1.21.1 https://github.com/TheCBProject/CodeChickenLib.git ccl-legacy
       - name: Patch CCL to 26.1.2
         run: python scripts/port_ccl.py
       - name: Build CCL
