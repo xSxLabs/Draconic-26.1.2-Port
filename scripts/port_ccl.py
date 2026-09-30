@@ -361,7 +361,7 @@ if p.exists():
 # Restore legacy 1.21.1 CCL API surface used by BrandonsCore/DE, then let targeted 26.1 patches adapt it.
 legacy = Path("ccl-legacy")
 if legacy.exists():
-    for rel in ["src/main/java/codechicken/lib/internal/network/ClientConfigurationPacketHandler.java"]:
+    for rel in []:
         src=legacy/rel; dst=root/rel
         if src.exists():
             dst.parent.mkdir(parents=True, exist_ok=True)
