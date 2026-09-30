@@ -380,3 +380,28 @@ if legacy.exists():
             t=re.sub(r"\\bResourceLocation\\b","Identifier",t)
             t=t.replace("Identifier.fromNamespaceAndPath(", "Identifier.fromNamespaceAndPath(")
             dst.write_text(t)
+
+# Reintroduce the lightweight GUI material facade; 26.1 atlas plumbing is handled separately.
+compat = root/"src/main/java/codechicken/lib/gui/modular/sprite"
+compat.mkdir(parents=True, exist_ok=True)
+(compat/"Material.java").write_text("""package codechicken.lib.gui.modular.sprite;
+import net.minecraft.resources.Identifier;
+public record Material(Identifier atlasLocation, Identifier texture) {}
+""")
+(compat/"GuiTextures.java").write_text("""package codechicken.lib.gui.modular.sprite;
+import net.minecraft.resources.Identifier;
+import net.neoforged.bus.api.IEventBus;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+public class GuiTextures {
+    private final String modId;
+    private final Map<String, Material> cache = new HashMap<>();
+    public GuiTextures(String modId){this.modId=modId;}
+    public void init(IEventBus modBus){}
+    public Material get(String texture){return cache.computeIfAbsent(texture, t -> new Material(Identifier.fromNamespaceAndPath(modId, "textures/atlas/gui.png"), Identifier.fromNamespaceAndPath(modId, "gui/"+t)));}
+    public Material get(Supplier<String> texture){return get(texture.get());}
+    public Supplier<Material> getter(Supplier<String> texture){return () -> get(texture.get());}
+    public Material getUncached(String texture){return new Material(Identifier.fromNamespaceAndPath(modId, "textures/atlas/gui.png"), Identifier.fromNamespaceAndPath(modId, "gui/"+texture));}
+}
+""")
