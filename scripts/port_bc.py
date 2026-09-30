@@ -180,17 +180,7 @@ if q.exists():
     t=t.replace("inv.offhand.size()", "1").replace("inv.offhand.get(i)", "inv.getItem(40)")
     q.write_text(t)
 
-# Utility command surface is isolated from DE runtime; defer it while core APIs are migrated.
-q=root/"src/main/java/com/brandon3055/brandonscore/command"
-if q.exists(): shutil.rmtree(q)
-q=root/"src/main/java/com/brandon3055/brandonscore/BrandonsCore.java"
-if q.exists():
-    t=q.read_text()
-    t=t.replace("import com.brandon3055.brandonscore.command.BCCommands;\n","")
-    t=t.replace("        BCCommands.init();\n","")
-    q.write_text(t)
-
-# Registry lookup and ResourceKey accessor migrations.
+# Preserve command surface for final functional port.\n\n# Registry lookup and ResourceKey accessor migrations.
 for java in (root/"src/main/java").rglob("*.java"):
     t=java.read_text()
     t=t.replace(".dimension().location()", ".dimension().identifier()")
