@@ -411,6 +411,17 @@ if legacy.exists():
     rel="src/main/java/codechicken/lib/gui/modular/elements/GuiEnergyBar.java"
     src=legacy/rel; dst=root/rel
     if src.exists():
-        t=src.read_text().replace("net.minecraft.resources.ResourceLocation","net.minecraft.resources.Identifier")
+        # Master already contains the 26.1 port, but commented out while upstream redesigns this widget.
+        master_text=dst.read_text() if dst.exists() else ""
+        if master_text.lstrip().startswith("//package"):
+            t="\n".join(line[2:] if line.startswith("//") else line for line in master_text.splitlines())+"\n"
+        else:
+            t=src.read_text()
+        t=t.replace("net.minecraft.resources.ResourceLocation","net.minecraft.resources.Identifier")
         t=re.sub(r"\\bResourceLocation\\b","Identifier",t)
+        t=t.replace("GuiGraphics graphics", "GuiGraphicsExtractor graphics")
+        t=t.replace("import net.minecraft.client.gui.GuiGraphics;", "import net.minecraft.client.gui.GuiGraphicsExtractor;")
+        t=t.replace("GuiRender::texColType", "RenderPipelines.GUI_TEXTURED")
+        if "import net.minecraft.client.renderer.RenderPipelines;" not in t:
+            t=t.replace("import net.minecraft.client.Minecraft;", "import net.minecraft.client.Minecraft;\nimport net.minecraft.client.renderer.RenderPipelines;")
         dst.write_text(t)
