@@ -223,3 +223,10 @@ if q.exists():
     t=t.replace("ResourceLocation.parse(nbt.getString(\"dim\"))", "Identifier.parse(nbt.getString(\"dim\").orElse(\"minecraft:overworld\"))")
     t=t.replace("nbt.getDouble(\"facing_x\")", "nbt.getDouble(\"facing_x\").orElse(0D)").replace("nbt.getDouble(\"facing_y\")", "nbt.getDouble(\"facing_y\").orElse(0D)")
     q.write_text(t)
+
+# Fix ResourceKey accessor and avoid double-applying Optional migration.
+q=root/"src/main/java/com/brandon3055/brandonscore/utils/TargetPos.java"
+if q.exists():
+    t=q.read_text().replace(".location()", ".identifier()")
+    t=t.replace(".orElse(0D).orElse(0D)", ".orElse(0D)")
+    q.write_text(t)
