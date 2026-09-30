@@ -27,3 +27,11 @@ if w.exists():
     t=w.read_text()
     t=re.sub(r"gradle-[0-9.]+-(bin|all)\\.zip","gradle-9.1.0-bin.zip",t)
     w.write_text(t)
+
+# 1.21 branch wrapper is 8.10; Java 25 requires Gradle 9.x.
+w=root/"gradle/wrapper/gradle-wrapper.properties"
+if w.exists():
+    t=w.read_text()
+    t=re.sub(r"gradle-[0-9.]+-(?:bin|all)\\.zip", "gradle-9.1.0-bin.zip", t)
+    t=t.replace("gradle-8.10-bin.zip","gradle-9.1.0-bin.zip")
+    w.write_text(t)
