@@ -121,3 +121,18 @@ for java in (root/"src/main/java").rglob("*.java"):
     t=re.sub(r"^import com\.brandon3055\.brandonscore\.init\.BCClient;\n","",t,flags=re.M)
     t=re.sub(r"^.*BCClient\..*;\n","",t,flags=re.M)
     java.write_text(t)
+
+# Remove source sets that are build-time/client-only or depend on APIs removed in 26.1.
+import shutil
+for rel in ["datagen","mixin","handlers/contributor"]:
+    q=root/"src/main/java/com/brandon3055/brandonscore"/rel
+    if q.exists(): shutil.rmtree(q)
+for rel in ["command/BCClientCommands.java","command/CommandTPX.java","lib/ThreadedImageDownloader.java","items/EquippedModelItem.java","utils/TargetPos.java"]:
+    q=root/"src/main/java/com/brandon3055/brandonscore"/rel
+    if q.exists(): q.unlink()
+
+# Common 26.1 Level accessor change.
+for java in (root/"src/main/java").rglob("*.java"):
+    t=java.read_text().replace(".isClientSide", ".isClientSide()")
+    t=t.replace(".isClientSide()()", ".isClientSide()")
+    java.write_text(t)
