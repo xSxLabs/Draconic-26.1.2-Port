@@ -162,3 +162,13 @@ for rel in ["lib/datamanager/TileDataManager.java","lib/datamanager/ManagedEnum.
         t=re.sub(r'\.contains\(([^,\n]+),\s*(?:8|10)\)', r'.contains(\1)', t)
         t=re.sub(r'\.getCompound\(([^\n\)]+)\)(?!\.orElse)', r'.getCompound(\1).orElseGet(CompoundTag::new)', t)
         q.write_text(t)
+
+# Small 26.1 primitive/API migrations.
+q=root/"src/main/java/com/brandon3055/brandonscore/lib/datamanager/ManagedEnum.java"
+if q.exists():
+    t=q.read_text().replace('nbt.getByte("value") & 0xFF','nbt.getByte("value").orElse((byte) 0) & 0xFF')
+    q.write_text(t)
+q=root/"src/main/java/com/brandon3055/brandonscore/api/power/OPStorage.java"
+if q.exists():
+    t=q.read_text().replace("((NumericTag) tag).getAsLong()","((NumericTag) tag).longValue()")
+    q.write_text(t)
