@@ -370,7 +370,6 @@ if legacy.exists():
 # Restore legacy CCL GUI/shader API classes still consumed by BrandonsCore and Draconic Evolution.
 if legacy.exists():
     legacy_files = [
-        "src/main/java/codechicken/lib/gui/modular/lib/GuiRender.java",
         "src/main/java/codechicken/lib/gui/modular/sprite/GuiTextures.java",
         "src/main/java/codechicken/lib/gui/modular/sprite/Material.java",
         "src/main/java/codechicken/lib/gui/modular/sprite/ModAtlasHolder.java",
