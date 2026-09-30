@@ -226,3 +226,15 @@ if q.exists():
     t=q.read_text().replace(".location()", ".identifier()")
     t=t.replace(".orElse(0D).orElse(0D)", ".orElse(0D)")
     q.write_text(t)
+
+# Port deprecated TeleportUtils to the 26.1 entity positioning signatures where direct equivalents exist.
+q=root/"src/main/java/com/brandon3055/brandonscore/lib/TeleportUtils.java"
+if q.exists():
+    t=q.read_text()
+    t=t.replace("entity.getServer()", "entity.level().getServer()")
+    t=t.replace("entity.moveTo(xCoord, yCoord, zCoord, rotY, rotX)", "entity.snapTo(xCoord, yCoord, zCoord, rotY, rotX)")
+    t=t.replace("movedEntity.moveTo(xCoord, yCoord, zCoord, rotY, rotX)", "movedEntity.snapTo(xCoord, yCoord, zCoord, rotY, rotX)")
+    t=t.replace("entity.moveTo(entity.getX() + offsetX, entity.getY() + offsetY, entity.getZ() + offsetZ, entity.getYRot(), entity.getXRot())", "entity.snapTo(entity.getX() + offsetX, entity.getY() + offsetY, entity.getZ() + offsetZ, entity.getYRot(), entity.getXRot())")
+    t=t.replace("passenger.entity.startRiding(entity, true)", "passenger.entity.startRiding(entity, true, false)")
+    t=t.replace("player.teleportTo(targetWorld, xCoord, yCoord, zCoord, rotY, rotX)", "player.teleportTo(targetWorld, xCoord, yCoord, zCoord, java.util.Set.of(), rotY, rotX, false)")
+    q.write_text(t)
