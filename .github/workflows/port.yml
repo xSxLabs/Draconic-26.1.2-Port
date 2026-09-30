@@ -21,7 +21,7 @@ jobs:
           chmod +x gradlew
           ./gradlew clean build -x test -x javadoc --stacktrace
       - name: Clone BrandonsCore
-        run: git clone --depth 1 https://github.com/Draconic-Inc/BrandonsCore.git bc
+        run: git clone --depth 1 --branch 1.21 https://github.com/Draconic-Inc/BrandonsCore.git bc
       - name: Patch BrandonsCore to 26.1.2
         run: python scripts/port_bc.py
       - name: Compile BrandonsCore
