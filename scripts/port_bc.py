@@ -310,3 +310,11 @@ if q.exists():
     t=t.replace("Identifier.fromNamespaceAndPath(", "Identifier.fromNamespaceAndPath(")
     t=t.replace("        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F); //Fixes broken hud when underwater\n","")
     q.write_text(t)
+
+# CCL 26.1 LanguageProvider merged client/server Side constructor.
+q=root/"src/main/java/com/brandon3055/brandonscore/datagen/LangGenerator.java"
+if q.exists():
+    t=q.read_text()
+    t=t.replace("public LangGenerator(DataGenerator gen, Side side) {\n        super(gen.getPackOutput(), MODID, \"en_us\", side);\n    }",
+                "public LangGenerator(DataGenerator gen) {\n        super(gen.getPackOutput(), MODID, \"en_us\");\n    }")
+    q.write_text(t)
