@@ -15,7 +15,7 @@ s=re.sub(r"\nminecraft \{[\s\S]*?\n\}\n\n+runs \{[\s\S]*?\n\}\n", '\nneoForge {\
 a=s.index("dependencies {")
 b=s.index("\nprocessResources {",a)
 s=s[:a]+'''dependencies {
-    implementation files("../ccl/build/libs/" + file("../ccl/build/libs").list().find { it.endsWith(".jar") && !it.contains("sources") && !it.contains("javadoc") })\n    implementation "net.covers1624:Quack:0.4.9.+"
+    implementation files("../ccl/build/libs/" + file("../ccl/build/libs").list().find { it.endsWith(".jar") && !it.contains("sources") && !it.contains("javadoc") })\n    implementation "net.covers1624:Quack:0.4.9.6"
 }
 '''+s[b:]
 # Publishing/signing are not needed to produce the port jar.
