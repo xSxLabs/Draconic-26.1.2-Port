@@ -276,3 +276,14 @@ if q.exists():
     t=t.replace("public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player)", "public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player)")
     t=t.replace("super.getCloneItemStack(state, target, level, pos, player)", "super.getCloneItemStack(level, pos, state, includeData, player)")
     q.write_text(t)
+
+# Vanilla 26.1 neighbor update now carries redstone Orientation.
+q=root/"src/main/java/com/brandon3055/brandonscore/blocks/BlockBCore.java"
+if q.exists():
+    t=q.read_text()
+    if "net.minecraft.world.level.redstone.Orientation" not in t:
+        t=t.replace("import net.minecraft.world.level.block.state.BlockState;", "import net.minecraft.world.level.block.state.BlockState;\nimport net.minecraft.world.level.redstone.Orientation;")
+    t=t.replace("public void neighborChanged(BlockState state, Level world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving)", "public void neighborChanged(BlockState state, Level world, BlockPos pos, Block blockIn, Orientation orientation, boolean isMoving)")
+    t=t.replace("((IChangeListener) tile).onNeighborChange(fromPos);", "((IChangeListener) tile).onNeighborChange(pos);")
+    t=t.replace("super.neighborChanged(state, world, pos, blockIn, fromPos, isMoving)", "super.neighborChanged(state, world, pos, blockIn, orientation, isMoving)")
+    q.write_text(t)
