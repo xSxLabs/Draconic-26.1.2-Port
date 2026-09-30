@@ -73,3 +73,15 @@ for java in (root/"src/main/java").rglob("*.java"):
 # Remove the remaining optional JEI-only helper.
 jei=root/"src/main/java/com/brandon3055/brandonscore/integration/ModularGuiProperties.java"
 if jei.exists(): jei.unlink()
+
+# 26.1 interaction result consolidation.
+for java in (root/"src/main/java").rglob("*.java"):
+    t=java.read_text()
+    t=t.replace("import net.minecraft.world.ItemInteractionResult;","")
+    t=re.sub(r"\bItemInteractionResult\b", "InteractionResult", t)
+    t=t.replace("InteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION","InteractionResult.PASS")
+    java.write_text(t)
+
+# Deprecated BC sign-edit hook targets the removed vanilla GameRules API; disable this isolated handler.
+p=root/"src/main/java/com/brandon3055/brandonscore/handlers/SighEditHandler.java"
+if p.exists(): p.unlink()
