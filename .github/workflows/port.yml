@@ -24,13 +24,6 @@ jobs:
           ./gradlew clean build -x test -x javadoc --stacktrace
       - name: Clone BrandonsCore
         run: git clone --depth 1 --branch 1.21 https://github.com/Draconic-Inc/BrandonsCore.git bc
-      - name: Inspect Minecraft 26.1 teleport API
-        run: |
-          JAR=$(find ~/.gradle/caches -type f -name '*.jar' | grep -E 'minecraft|joined|client-extra' | head -1 || true)
-          if [ -n "$JAR" ]; then
-            javap -classpath "$JAR" net.minecraft.world.entity.Entity 2>/dev/null | grep -E 'teleport|changeDimension|snapTo|startRiding' || true
-            javap -classpath "$JAR" net.minecraft.server.level.ServerPlayer 2>/dev/null | grep -E 'teleport|changeDimension' || true
-          fi
       - name: Patch BrandonsCore to 26.1.2
         run: python scripts/port_bc.py
       - name: Compile BrandonsCore
