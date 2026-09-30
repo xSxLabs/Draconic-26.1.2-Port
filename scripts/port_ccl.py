@@ -405,3 +405,12 @@ public class GuiTextures {
     public Material getUncached(String texture){return new Material(Identifier.fromNamespaceAndPath(modId, "textures/atlas/gui.png"), Identifier.fromNamespaceAndPath(modId, "gui/"+texture));}
 }
 """)
+
+# Restore GuiEnergyBar API (master currently carries it commented out).
+if legacy.exists():
+    rel="src/main/java/codechicken/lib/gui/modular/elements/GuiEnergyBar.java"
+    src=legacy/rel; dst=root/rel
+    if src.exists():
+        t=src.read_text().replace("net.minecraft.resources.ResourceLocation","net.minecraft.resources.Identifier")
+        t=re.sub(r"\\bResourceLocation\\b","Identifier",t)
+        dst.write_text(t)
