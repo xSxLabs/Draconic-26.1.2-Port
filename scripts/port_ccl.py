@@ -425,3 +425,26 @@ if legacy.exists():
         if "import net.minecraft.client.renderer.RenderPipelines;" not in t:
             t=t.replace("import net.minecraft.client.Minecraft;", "import net.minecraft.client.Minecraft;\nimport net.minecraft.client.renderer.RenderPipelines;")
         dst.write_text(t)
+
+# Minimal 26.1 sprite compatibility used by restored modular widgets.
+compat=root/"src/main/java/codechicken/lib/gui/modular/sprite"
+(compat/"SpriteSupplier.java").write_text("""package codechicken.lib.gui.modular.sprite;
+import net.minecraft.client.renderer.RenderPipeline;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import java.util.function.Function;
+public interface SpriteSupplier {
+    default TextureAtlasSprite sprite(){ return null; }
+    default RenderPipeline renderType(Function<Material, RenderPipeline> factory){ return factory.apply(material()); }
+    Material material();
+}
+""")
+# Add CCL singleton expected by legacy widgets.
+q=compat/"GuiTextures.java"
+if q.exists():
+    t=q.read_text()
+    if "public static final GuiTextures CCL" not in t:
+        t=t.replace("public class GuiTextures {", 'public class GuiTextures {\n    public static final GuiTextures CCL = new GuiTextures("ccl");')
+    t=t.replace("public Material get(String texture)", "public SpriteSupplier get(String texture)")
+    t=t.replace("return cache.computeIfAbsent(texture, t -> new Material(", "Material m = cache.computeIfAbsent(texture, t -> new Material(")
+    t=t.replace('Identifier.fromNamespaceAndPath(modId, "gui/"+t)));', 'Identifier.fromNamespaceAndPath(modId, "gui/"+t))); return () -> m;')
+    q.write_text(t)
