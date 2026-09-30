@@ -236,3 +236,8 @@ if q.exists():
     t=q.read_text().replace("import codechicken.lib.internal.network.ClientConfigurationPacketHandler;\n","")
     t=t.replace("            .clientConfiguration(() -> ClientConfigurationPacketHandler::new)\n","")
     q.write_text(t)
+
+# NeoForge 26.1 renamed its standard energy capability.
+for java in (root/"src/main/java").rglob("*.java"):
+    t=java.read_text().replace("Capabilities.EnergyStorage.", "Capabilities.Energy.")
+    java.write_text(t)
