@@ -95,10 +95,6 @@ if p.exists():
     t=re.sub(r"^.*SighEditHandler.*\n","",t,flags=re.M)
     p.write_text(t)
 
-# Deprecated teleport utility is not used by current DE core and depends on removed DimensionTransition.
-p=root/"src/main/java/com/brandon3055/brandonscore/lib/TeleportUtils.java"
-if p.exists(): p.unlink()
-
 # Preserve full BrandonsCore client/contributor/runtime surface; migrate it instead of pruning.\n\n# Common 26.1 Level accessor change.
 for java in (root/"src/main/java").rglob("*.java"):
     t=java.read_text().replace(".isClientSide", ".isClientSide()")
