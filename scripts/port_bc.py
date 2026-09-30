@@ -136,3 +136,10 @@ for java in (root/"src/main/java").rglob("*.java"):
     t=java.read_text().replace(".isClientSide", ".isClientSide()")
     t=t.replace(".isClientSide()()", ".isClientSide()")
     java.write_text(t)
+
+# 26.1 NBT boolean getters return Optional values.
+for java in (root/'src/main/java').rglob('*.java'):
+    t=java.read_text()
+    for k in ['detectPassive','detectHostile','detectPlayer','detectOther','isWhiteList']:
+        t=t.replace('getBoolean("'+k+'")','getBoolean("'+k+'").orElse(false)')
+    java.write_text(t)
