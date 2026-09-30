@@ -153,3 +153,12 @@ for java in (root/"src/main/java").rglob("*.java"):
     t=t.replace('nbt.getCompound("bc_caps")', 'nbt.getCompound("bc_caps").orElseGet(CompoundTag::new)')
     t=t.replace('nbt.contains("custom_name", 8)', 'nbt.contains("custom_name")')
     java.write_text(t)
+
+# CompoundTag 26.1 typed contains/getCompound changes in core data manager.
+for rel in ["lib/datamanager/TileDataManager.java","lib/datamanager/ManagedEnum.java","lib/StringyStacks.java","blocks/TileCapabilityManager.java"]:
+    q=root/"src/main/java/com/brandon3055/brandonscore"/rel
+    if q.exists():
+        t=q.read_text()
+        t=re.sub(r'\.contains\(([^,\n]+),\s*(?:8|10)\)', r'.contains(\1)', t)
+        t=re.sub(r'\.getCompound\(([^\n\)]+)\)(?!\.orElse)', r'.getCompound(\1).orElseGet(CompoundTag::new)', t)
+        q.write_text(t)
