@@ -318,3 +318,9 @@ if q.exists():
     t=t.replace("public LangGenerator(DataGenerator gen, Side side) {\n        super(gen.getPackOutput(), MODID, \"en_us\", side);\n    }",
                 "public LangGenerator(DataGenerator gen) {\n        super(gen.getPackOutput(), MODID, \"en_us\");\n    }")
     q.write_text(t)
+
+# Undo Optional rewrite accidentally applied to Brigadier StringArgumentType.
+for java in (root/"src/main/java/com/brandon3055/brandonscore/command").rglob("*.java"):
+    t=java.read_text()
+    t=re.sub(r'(StringArgumentType\.getString\([^\n;]+?\))\.orElse\(\"\"\)', r'\1', t)
+    java.write_text(t)
