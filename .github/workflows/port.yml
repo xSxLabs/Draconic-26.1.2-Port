@@ -21,7 +21,8 @@ jobs:
         working-directory: ccl
         run: |
           chmod +x gradlew
-          ./gradlew clean build -x test -x javadoc --stacktrace
+          for i in 1 2 3 4; do ./gradlew clean build -x test -x javadoc --stacktrace && break; sleep 20; done
+          test -n "$(find build/libs -name '*.jar' -not -name '*sources*' -not -name '*javadoc*' -print -quit)"
       - name: Clone BrandonsCore
         run: git clone --depth 1 --branch 1.21 https://github.com/Draconic-Inc/BrandonsCore.git bc
       - name: Patch BrandonsCore to 26.1.2
