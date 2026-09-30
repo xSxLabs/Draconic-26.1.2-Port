@@ -301,3 +301,12 @@ if q.exists():
     t=q.read_text()
     t=t.replace("hudElements.put(key, HUD_REGISTRY.get(key));", "HUD_REGISTRY.get(key).ifPresent(ref -> hudElements.put(key, ref.value()));")
     q.write_text(t)
+
+# 26.1 Identifier rename in HUD manager.
+q=root/"src/main/java/com/brandon3055/brandonscore/client/hud/HudManager.java"
+if q.exists():
+    t=q.read_text().replace("net.minecraft.resources.ResourceLocation","net.minecraft.resources.Identifier")
+    t=re.sub(r"\\bResourceLocation\\b","Identifier",t)
+    t=t.replace("Identifier.fromNamespaceAndPath(", "Identifier.fromNamespaceAndPath(")
+    t=t.replace("        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F); //Fixes broken hud when underwater\n","")
+    q.write_text(t)
