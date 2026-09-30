@@ -40,3 +40,15 @@ p=root/"build.gradle"
 t=p.read_text()
 t=re.sub(r"\s*id 'com\.github\.johnrengelman\.shadow'.*\n", "\n", t)
 p.write_text(t)
+
+# Broad Mojang 26.1 naming migrations.
+for java in (root/"src/main/java").rglob("*.java"):
+    t=java.read_text()
+    t=t.replace("net.minecraft.resources.ResourceLocation", "net.minecraft.resources.Identifier")
+    t=re.sub(r"\bResourceLocation\b", "Identifier", t)
+    t=t.replace("Identifier.fromNamespaceAndPath(", "Identifier.fromNamespaceAndPath(")
+    java.write_text(t)
+
+# Optional JEI integration cannot compile until a 26.1 JEI API is available.
+jei=root/"src/main/java/com/brandon3055/brandonscore/integration/BCJEIPlugin.java"
+if jei.exists(): jei.unlink()
