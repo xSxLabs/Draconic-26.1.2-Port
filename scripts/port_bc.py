@@ -52,3 +52,24 @@ for java in (root/"src/main/java").rglob("*.java"):
 # Optional JEI integration cannot compile until a 26.1 JEI API is available.
 jei=root/"src/main/java/com/brandon3055/brandonscore/integration/BCJEIPlugin.java"
 if jei.exists(): jei.unlink()
+
+# NeoForge 26.1 removed INBTSerializable. Supply the compatibility contract BC uses while porting call sites.
+compat=root/"src/main/java/net/neoforged/neoforge/common/util/INBTSerializable.java"
+compat.parent.mkdir(parents=True, exist_ok=True)
+compat.write_text("""package net.neoforged.neoforge.common.util;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.Tag;
+public interface INBTSerializable<T extends Tag> {
+    T serializeNBT(HolderLookup.Provider provider);
+    void deserializeNBT(HolderLookup.Provider provider, T nbt);
+}
+""")
+
+# Util was renamed in Mojang 26.1.
+for java in (root/"src/main/java").rglob("*.java"):
+    t=java.read_text().replace("import net.minecraft.Util;","import net.minecraft.util.Util;")
+    java.write_text(t)
+
+# Remove the remaining optional JEI-only helper.
+jei=root/"src/main/java/com/brandon3055/brandonscore/integration/ModularGuiProperties.java"
+if jei.exists(): jei.unlink()
