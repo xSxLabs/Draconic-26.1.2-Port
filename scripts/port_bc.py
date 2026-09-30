@@ -249,3 +249,14 @@ if q.exists():
     t=re.sub(r'        Entity movedEntity = entity\.changeDimension\(new DimensionTransition\([^\n]+\);\n        if \(movedEntity != null\) \{[\s\S]*?        \}\n\n        entity\.unRide\(\);\n        movedEntity = entity\.getType\(\)\.create\(targetWorld\);',
              '        entity.unRide();\n        Entity movedEntity = entity.getType().create(targetWorld, EntitySpawnReason.TRIGGERED);', t, count=1)
     q.write_text(t)
+
+# BlockBCore 26.1 signature updates that are mechanically known.
+q=root/"src/main/java/com/brandon3055/brandonscore/blocks/BlockBCore.java"
+if q.exists():
+    t=q.read_text()
+    t=t.replace("import net.neoforged.neoforge.client.event.RenderHighlightEvent;\n","")
+    t=re.sub(r'\n    @OnlyIn\(Dist.CLIENT\)\n    public boolean renderSelectionBox\(RenderHighlightEvent\.Block event, Level level\) \{\n        return true;\n    \}', '', t)
+    t=t.replace("public void onBlockExploded(BlockState state, Level world,", "public void onBlockExploded(BlockState state, ServerLevel world,")
+    if "import net.minecraft.server.level.ServerLevel;" not in t:
+        t=t.replace("import net.minecraft.world.level.Level;", "import net.minecraft.world.level.Level;\nimport net.minecraft.server.level.ServerLevel;")
+    q.write_text(t)
