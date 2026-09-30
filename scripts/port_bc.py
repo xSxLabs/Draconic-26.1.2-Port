@@ -143,3 +143,13 @@ for java in (root/'src/main/java').rglob('*.java'):
     for k in ['detectPassive','detectHostile','detectPlayer','detectOther','isWhiteList']:
         t=t.replace('getBoolean("'+k+'")','getBoolean("'+k+'").orElse(false)')
     java.write_text(t)
+
+# Additional generic 26.1 NBT getter migrations.
+for java in (root/"src/main/java").rglob("*.java"):
+    t=java.read_text()
+    t=t.replace("compound.getBoolean(name);", "compound.getBoolean(name).orElse(false);")
+    t=t.replace('nbt.getString("custom_name");', 'nbt.getString("custom_name").orElse("");')
+    t=t.replace('nbt.getCompound(tagName)', 'nbt.getCompound(tagName).orElseGet(CompoundTag::new)')
+    t=t.replace('nbt.getCompound("bc_caps")', 'nbt.getCompound("bc_caps").orElseGet(CompoundTag::new)')
+    t=t.replace('nbt.contains("custom_name", 8)', 'nbt.contains("custom_name")')
+    java.write_text(t)
