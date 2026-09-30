@@ -342,3 +342,9 @@ for java in (root/"src/main/java").rglob("*.java"):
     t=t.replace("net.minecraft.client.renderer.RenderType", "net.minecraft.client.renderer.rendertype.RenderType")
     t=t.replace("net.minecraft.client.renderer.RenderStateShard", "net.minecraft.client.renderer.rendertype.RenderStateShard")
     java.write_text(t)
+
+# Mark dirty API changed; LevelChunk no longer exposes setUnsaved.
+q=root/"src/main/java/com/brandon3055/brandonscore/blocks/TileBCore.java"
+if q.exists():
+    t=q.read_text().replace("        chunk.setUnsaved(true);", "        setChanged();")
+    q.write_text(t)
