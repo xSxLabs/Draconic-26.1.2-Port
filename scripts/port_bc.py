@@ -85,3 +85,24 @@ for java in (root/"src/main/java").rglob("*.java"):
 # Deprecated BC sign-edit hook targets the removed vanilla GameRules API; disable this isolated handler.
 p=root/"src/main/java/com/brandon3055/brandonscore/handlers/SighEditHandler.java"
 if p.exists(): p.unlink()
+
+# Remove stale registration/import left by disabled sign handler.
+p=root/"src/main/java/com/brandon3055/brandonscore/BrandonsCore.java"
+if p.exists():
+    t=p.read_text()
+    t=t.replace("import com.brandon3055.brandonscore.handlers.SighEditHandler;\n","")
+    t=re.sub(r"^.*SighEditHandler.*\n","",t,flags=re.M)
+    p.write_text(t)
+
+# Deprecated teleport utility is not used by current DE core and depends on removed DimensionTransition.
+p=root/"src/main/java/com/brandon3055/brandonscore/lib/TeleportUtils.java"
+if p.exists(): p.unlink()
+
+# CCL master has removed the old modular GUI/sprite/shader stack. Temporarily exclude BC client modules tied exclusively to that removed API.
+for rel in [
+"client/BCGuiTextures.java","client/shader/BCShader.java","client/shader/ContribShader.java",
+"client/model/ContributorModel.java","client/model/EquippedItemModelLayer.java",
+"client/hud/HudManager.java","client/hud/HudDataElement.java",
+"api/hud/AbstractHudElement.java","api/hud/IHudDisplay.java"]:
+    q=root/"src/main/java/com/brandon3055/brandonscore"/rel
+    if q.exists(): q.unlink()
