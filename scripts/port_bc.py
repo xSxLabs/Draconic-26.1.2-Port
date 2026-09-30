@@ -210,3 +210,16 @@ if q.exists():
     t=t.replace("net.minecraft.resources.ResourceLocation", "net.minecraft.resources.Identifier")
     t=re.sub(r"\bResourceLocation\b", "Identifier", t)
     q.write_text(t)
+
+# TechLevel no longer needs the removed vanilla Tier type (field was unused upstream).
+q=root/"src/main/java/com/brandon3055/brandonscore/api/TechLevel.java"
+if q.exists():
+    t=q.read_text().replace("import net.minecraft.world.item.Tier;\n","").replace("    private Tier itemTier;\n","")
+    q.write_text(t)
+# TargetPos identifier + Optional NBT migration.
+q=root/"src/main/java/com/brandon3055/brandonscore/utils/TargetPos.java"
+if q.exists():
+    t=q.read_text().replace("import net.minecraft.resources.ResourceLocation;","import net.minecraft.resources.Identifier;")
+    t=t.replace("ResourceLocation.parse(nbt.getString(\"dim\"))", "Identifier.parse(nbt.getString(\"dim\").orElse(\"minecraft:overworld\"))")
+    t=t.replace("nbt.getDouble(\"facing_x\")", "nbt.getDouble(\"facing_x\").orElse(0D)").replace("nbt.getDouble(\"facing_y\")", "nbt.getDouble(\"facing_y\").orElse(0D)")
+    q.write_text(t)
