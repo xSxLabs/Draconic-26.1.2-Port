@@ -190,3 +190,24 @@ for java in (root/"src/main/java").rglob("*.java"):
         t=re.sub(pat, lambda m: "."+meth+"("+m.group(1)+").orElse("+default+")", t)
     t=re.sub(r'\.getCompound\(([^\n()]+)\)(?!\.orElse)', r'.getCompound(\1).orElseGet(CompoundTag::new)', t)
     java.write_text(t)
+
+# Inventory encapsulation introduced before 26.1: use Container slot API.
+q=root/"src/main/java/com/brandon3055/brandonscore/inventory/PlayerSlot.java"
+if q.exists():
+    t=q.read_text()
+    t=t.replace("player.getInventory().selected", "player.getInventory().getSelectedSlot()")
+    t=t.replace("inv.getSelected()", "inv.getSelectedItem()")
+    t=t.replace("inv.selected", "inv.getSelectedSlot()")
+    t=t.replace("player.getInventory().items.size()", "36")
+    t=t.replace("player.getInventory().items.set(slot, stack)", "player.getInventory().setItem(slot, stack)")
+    t=t.replace("player.getInventory().armor.size()", "4")
+    t=t.replace("player.getInventory().armor.set(slot, stack)", "player.getInventory().setItem(36 + slot, stack)")
+    t=t.replace("player.getInventory().offhand.size()", "1")
+    t=t.replace("player.getInventory().offhand.set(slot, stack)", "player.getInventory().setItem(40, stack)")
+    t=t.replace("player.getInventory().armor.get(slot)", "player.getInventory().getItem(36 + slot)")
+    t=t.replace("player.getInventory().items.get(slot)", "player.getInventory().getItem(slot)")
+    t=t.replace("player.getInventory().offhand.get(slot)", "player.getInventory().getItem(40)")
+    t=t.replace("inv.items.size()", "36").replace("inv.items.get(i)", "inv.getItem(i)")
+    t=t.replace("inv.armor.size()", "4").replace("inv.armor.get(i)", "inv.getItem(36 + i)")
+    t=t.replace("inv.offhand.size()", "1").replace("inv.offhand.get(i)", "inv.getItem(40)")
+    q.write_text(t)
