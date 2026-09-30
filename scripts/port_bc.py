@@ -221,3 +221,11 @@ if q.exists():
     t=t.replace("import com.brandon3055.brandonscore.command.BCCommands;\n","")
     t=t.replace("        BCCommands.init();\n","")
     q.write_text(t)
+
+# Registry lookup and ResourceKey accessor migrations.
+for java in (root/"src/main/java").rglob("*.java"):
+    t=java.read_text()
+    t=t.replace(".dimension().location()", ".dimension().identifier()")
+    for reg in ["BLOCK","ITEM","ENTITY_TYPE","FLUID"]:
+        t=t.replace("BuiltInRegistries."+reg+".get(", "BuiltInRegistries."+reg+".getValue(")
+    java.write_text(t)
