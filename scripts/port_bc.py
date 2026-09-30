@@ -260,3 +260,11 @@ if q.exists():
     if "import net.minecraft.server.level.ServerLevel;" not in t:
         t=t.replace("import net.minecraft.world.level.Level;", "import net.minecraft.world.level.Level;\nimport net.minecraft.server.level.ServerLevel;")
     q.write_text(t)
+
+# BlockBCore imports Level through wildcard, so add explicit ServerLevel import.
+q=root/"src/main/java/com/brandon3055/brandonscore/blocks/BlockBCore.java"
+if q.exists():
+    t=q.read_text()
+    if "import net.minecraft.server.level.ServerLevel;" not in t:
+        t=t.replace("import net.minecraft.stats.Stats;", "import net.minecraft.stats.Stats;\nimport net.minecraft.server.level.ServerLevel;")
+    q.write_text(t)
