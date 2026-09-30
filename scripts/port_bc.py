@@ -229,3 +229,10 @@ for java in (root/"src/main/java").rglob("*.java"):
     for reg in ["BLOCK","ITEM","ENTITY_TYPE","FLUID"]:
         t=t.replace("BuiltInRegistries."+reg+".get(", "BuiltInRegistries."+reg+".getValue(")
     java.write_text(t)
+
+# CCL 26.1 no longer exposes its configuration packet handler to consumers.
+q=root/"src/main/java/com/brandon3055/brandonscore/network/BCoreNetwork.java"
+if q.exists():
+    t=q.read_text().replace("import codechicken.lib.internal.network.ClientConfigurationPacketHandler;\n","")
+    t=t.replace("            .clientConfiguration(() -> ClientConfigurationPacketHandler::new)\n","")
+    q.write_text(t)
