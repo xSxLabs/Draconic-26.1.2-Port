@@ -106,3 +106,18 @@ for rel in [
 "api/hud/AbstractHudElement.java","api/hud/IHudDisplay.java"]:
     q=root/"src/main/java/com/brandon3055/brandonscore"/rel
     if q.exists(): q.unlink()
+
+# Exclude the remainder of BC's legacy client implementation for the server/core compatibility pass.
+client=root/"src/main/java/com/brandon3055/brandonscore/client"
+if client.exists():
+    import shutil
+    shutil.rmtree(client)
+p=root/"src/main/java/com/brandon3055/brandonscore/init/BCClient.java"
+if p.exists(): p.unlink()
+
+# Remove references to the disabled client bootstrap from common code.
+for java in (root/"src/main/java").rglob("*.java"):
+    t=java.read_text()
+    t=re.sub(r"^import com\.brandon3055\.brandonscore\.init\.BCClient;\n","",t,flags=re.M)
+    t=re.sub(r"^.*BCClient\..*;\n","",t,flags=re.M)
+    java.write_text(t)
