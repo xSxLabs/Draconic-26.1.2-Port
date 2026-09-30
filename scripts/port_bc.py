@@ -335,3 +335,10 @@ if q.exists():
     if "getInternalIndex" not in t:
         t=t.replace(marker, '    @Override\n    public int getInternalIndex(String value) {\n        return ArrayUtils.indexOf(metaLookup, value.intern());\n    }\n\n'+marker)
     q.write_text(t)
+
+# Minecraft 26.1 moved render types into renderer.rendertype.
+for java in (root/"src/main/java").rglob("*.java"):
+    t=java.read_text()
+    t=t.replace("net.minecraft.client.renderer.RenderType", "net.minecraft.client.renderer.rendertype.RenderType")
+    t=t.replace("net.minecraft.client.renderer.RenderStateShard", "net.minecraft.client.renderer.rendertype.RenderStateShard")
+    java.write_text(t)
