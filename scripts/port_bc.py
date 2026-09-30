@@ -241,3 +241,14 @@ if q.exists():
 for java in (root/"src/main/java").rglob("*.java"):
     t=java.read_text().replace("Capabilities.EnergyStorage.", "Capabilities.Energy.")
     java.write_text(t)
+
+# NeoForge 26.1 server reload event rename and keyed registration.
+q=root/"src/main/java/com/brandon3055/brandonscore/multiblock/MultiBlockManager.java"
+if q.exists():
+    t=q.read_text().replace("AddReloadListenerEvent", "AddServerReloadListenersEvent")
+    t=t.replace("event.addListener(new MultiBlockManager());", 'event.addListener(Identifier.fromNamespaceAndPath(BrandonsCore.MODID, "multiblocks"), new MultiBlockManager());')
+    if "import com.brandon3055.brandonscore.BrandonsCore;" not in t:
+        t=t.replace("import com.brandon3055.brandonscore.network.BCoreNetwork;", "import com.brandon3055.brandonscore.BrandonsCore;\nimport com.brandon3055.brandonscore.network.BCoreNetwork;")
+    t=t.replace("net.minecraft.resources.ResourceLocation", "net.minecraft.resources.Identifier")
+    t=re.sub(r"\bResourceLocation\b", "Identifier", t)
+    q.write_text(t)
