@@ -348,3 +348,9 @@ q=root/"src/main/java/com/brandon3055/brandonscore/blocks/TileBCore.java"
 if q.exists():
     t=q.read_text().replace("        chunk.setUnsaved(true);", "        setChanged();")
     q.write_text(t)
+
+# 26.1 RenderType relocation used throughout BC client rendering.
+for java in (root/"src/main/java/com/brandon3055/brandonscore").rglob("*.java"):
+    t=java.read_text()
+    t=t.replace("import net.minecraft.client.renderer.RenderType;", "import net.minecraft.client.renderer.rendertype.RenderType;")
+    java.write_text(t)
