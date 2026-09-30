@@ -324,3 +324,14 @@ for java in (root/"src/main/java/com/brandon3055/brandonscore/command").rglob("*
     t=java.read_text()
     t=re.sub(r'(StringArgumentType\.getString\([^\n;]+?\))\.orElse\(\"\"\)', r'\1', t)
     java.write_text(t)
+
+# Property API now requires stable list ordering and internal index lookup.
+q=root/"src/main/java/com/brandon3055/brandonscore/blocks/PropertyString.java"
+if q.exists():
+    t=q.read_text()
+    t=t.replace("public Collection<String> getPossibleValues() {\n        return Collections.unmodifiableSet(valuesSet);\n    }",
+                "public List<String> getPossibleValues() {\n        return Collections.unmodifiableList(Arrays.asList(metaLookup));\n    }")
+    marker='    public int toMeta(String value) {'
+    if "getInternalIndex" not in t:
+        t=t.replace(marker, '    @Override\n    public int getInternalIndex(String value) {\n        return ArrayUtils.indexOf(metaLookup, value.intern());\n    }\n\n'+marker)
+    q.write_text(t)
