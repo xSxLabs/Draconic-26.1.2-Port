@@ -238,3 +238,14 @@ if q.exists():
     t=t.replace("passenger.entity.startRiding(entity, true)", "passenger.entity.startRiding(entity, true, false)")
     t=t.replace("player.teleportTo(targetWorld, xCoord, yCoord, zCoord, rotY, rotX)", "player.teleportTo(targetWorld, xCoord, yCoord, zCoord, java.util.Set.of(), rotY, rotX, false)")
     q.write_text(t)
+
+# 26.1 cross-dimension entity fallback: recreate entity with explicit teleport spawn reason.
+q=root/"src/main/java/com/brandon3055/brandonscore/lib/TeleportUtils.java"
+if q.exists():
+    t=q.read_text()
+    t=t.replace("import net.minecraft.world.level.portal.DimensionTransition;\n","")
+    if "import net.minecraft.world.entity.EntitySpawnReason;" not in t:
+        t=t.replace("import net.minecraft.world.entity.Entity;","import net.minecraft.world.entity.Entity;\nimport net.minecraft.world.entity.EntitySpawnReason;")
+    t=re.sub(r'        Entity movedEntity = entity\.changeDimension\(new DimensionTransition\([^\n]+\);\n        if \(movedEntity != null\) \{[\s\S]*?        \}\n\n        entity\.unRide\(\);\n        movedEntity = entity\.getType\(\)\.create\(targetWorld\);',
+             '        entity.unRide();\n        Entity movedEntity = entity.getType().create(targetWorld, EntitySpawnReason.TRIGGERED);', t, count=1)
+    q.write_text(t)
