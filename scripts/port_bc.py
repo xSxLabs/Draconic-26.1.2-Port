@@ -35,3 +35,8 @@ if w.exists():
     t=re.sub(r"gradle-[0-9.]+-(?:bin|all)\\.zip", "gradle-9.1.0-bin.zip", t)
     t=t.replace("gradle-8.10-bin.zip","gradle-9.1.0-bin.zip")
     w.write_text(t)
+
+p=root/"build.gradle"
+t=p.read_text()
+t=re.sub(r"\s*id 'com\.github\.johnrengelman\.shadow'.*\n", "\n", t)
+p.write_text(t)
