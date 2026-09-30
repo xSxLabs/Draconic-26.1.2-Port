@@ -294,3 +294,10 @@ if q.exists():
     t=q.read_text()
     t=re.sub(r'\n    @OnlyIn \(Dist\.CLIENT\)\n    @Override\n    public void appendHoverText\([\s\S]*?\n    \}\n', '\n', t, count=1)
     q.write_text(t)
+
+# Registry.get now returns Optional references in 26.1.
+q=root/"src/main/java/com/brandon3055/brandonscore/client/hud/HudManager.java"
+if q.exists():
+    t=q.read_text()
+    t=t.replace("hudElements.put(key, HUD_REGISTRY.get(key));", "HUD_REGISTRY.get(key).ifPresent(ref -> hudElements.put(key, ref.value()));")
+    q.write_text(t)
