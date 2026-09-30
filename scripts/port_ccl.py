@@ -366,3 +366,39 @@ if legacy.exists():
         if src.exists():
             dst.parent.mkdir(parents=True, exist_ok=True)
             dst.write_text(src.read_text().replace("net.minecraft.resources.ResourceLocation","net.minecraft.resources.Identifier").replace("ResourceLocation","Identifier"))
+
+# Restore legacy CCL GUI/shader API classes still consumed by BrandonsCore and Draconic Evolution.
+if legacy.exists():
+    legacy_files = [
+        "src/main/java/codechicken/lib/gui/modular/lib/GuiRender.java",
+        "src/main/java/codechicken/lib/gui/modular/sprite/GuiTextures.java",
+        "src/main/java/codechicken/lib/gui/modular/sprite/Material.java",
+        "src/main/java/codechicken/lib/gui/modular/sprite/ModAtlasHolder.java",
+        "src/main/java/codechicken/lib/render/shader/AbstractShaderObject.java",
+        "src/main/java/codechicken/lib/render/shader/AssetShaderObject.java",
+        "src/main/java/codechicken/lib/render/shader/BinaryShaderObject.java",
+        "src/main/java/codechicken/lib/render/shader/BinaryType.java",
+        "src/main/java/codechicken/lib/render/shader/CCShaderInstance.java",
+        "src/main/java/codechicken/lib/render/shader/CCUniform.java",
+        "src/main/java/codechicken/lib/render/shader/ConstantCache.java",
+        "src/main/java/codechicken/lib/render/shader/GlslProcessor.java",
+        "src/main/java/codechicken/lib/render/shader/ICCUniform.java",
+        "src/main/java/codechicken/lib/render/shader/NamedShaderObject.java",
+        "src/main/java/codechicken/lib/render/shader/ShaderConstantCache.java",
+        "src/main/java/codechicken/lib/render/shader/ShaderObject.java",
+        "src/main/java/codechicken/lib/render/shader/ShaderProgram.java",
+        "src/main/java/codechicken/lib/render/shader/ShaderProgramBuilder.java",
+        "src/main/java/codechicken/lib/render/shader/SimpleShaderObject.java",
+        "src/main/java/codechicken/lib/render/shader/UniformPair.java",
+        "src/main/java/codechicken/lib/render/shader/UniformType.java",
+        "src/main/java/codechicken/lib/render/shader/package-info.java",
+    ]
+    for rel in legacy_files:
+        src=legacy/rel; dst=root/rel
+        if src.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            t=src.read_text()
+            t=t.replace("net.minecraft.resources.ResourceLocation","net.minecraft.resources.Identifier")
+            t=re.sub(r"\\bResourceLocation\\b","Identifier",t)
+            t=t.replace("Identifier.fromNamespaceAndPath(", "Identifier.fromNamespaceAndPath(")
+            dst.write_text(t)
