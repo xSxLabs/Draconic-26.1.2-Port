@@ -1,5 +1,5 @@
 name: Port build 26.1.2
-# trigger: continue-port-2026-10-01
+# trigger: pr-build-2026-10-01-b
 on:
   push:
   pull_request:
@@ -36,7 +36,7 @@ jobs:
           ./gradlew wrapper --gradle-version 9.1.0 || true
           ./gradlew compileJava --stacktrace
       - name: Upload CCL
-        if: success()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: CodeChickenLib-26.1.2-port
