@@ -2,6 +2,7 @@ name: Port build 26.1.2
 # trigger: pr-build-2026-10-01
 on:
   push:
+  pull_request:
   workflow_dispatch:
 jobs:
   ccl:
