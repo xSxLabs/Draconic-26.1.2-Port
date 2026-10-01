@@ -400,8 +400,8 @@ public class GuiTextures {
     public GuiTextures(String modId){this.modId=modId;}
     public void init(IEventBus modBus){}
     public Material get(String texture){return cache.computeIfAbsent(texture, t -> new Material(Identifier.fromNamespaceAndPath(modId, "textures/atlas/gui.png"), Identifier.fromNamespaceAndPath(modId, "gui/"+t)));}
-    public Material get(Supplier<String> texture){return get(texture.get());}
-    public Supplier<Material> getter(Supplier<String> texture){return () -> get(texture.get());}
+    public SpriteSupplier get(Supplier<String> texture){return get(texture.get());}
+    public Supplier<SpriteSupplier> getter(Supplier<String> texture){return () -> get(texture.get());}
     public Material getUncached(String texture){return new Material(Identifier.fromNamespaceAndPath(modId, "textures/atlas/gui.png"), Identifier.fromNamespaceAndPath(modId, "gui/"+texture));}
 }
 """)
@@ -429,12 +429,11 @@ if legacy.exists():
 # Minimal 26.1 sprite compatibility used by restored modular widgets.
 compat=root/"src/main/java/codechicken/lib/gui/modular/sprite"
 (compat/"SpriteSupplier.java").write_text("""package codechicken.lib.gui.modular.sprite;
-import net.minecraft.client.renderer.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import java.util.function.Function;
 public interface SpriteSupplier {
     default TextureAtlasSprite sprite(){ return null; }
-    default RenderPipeline renderType(Function<Material, RenderPipeline> factory){ return factory.apply(material()); }
+    default RenderPipeline renderType(RenderPipeline pipeline){ return pipeline; }
     Material material();
 }
 """)
