@@ -36,7 +36,7 @@ jobs:
           ./gradlew wrapper --gradle-version 9.1.0 || true
           ./gradlew compileJava --stacktrace
       - name: Upload CCL
-        if: success()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: CodeChickenLib-26.1.2-port
